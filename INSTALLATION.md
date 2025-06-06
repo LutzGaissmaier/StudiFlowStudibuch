@@ -56,7 +56,9 @@ Das System läuft komplett im Browser - keine zusätzliche Installation erforder
 ```bash
 # Falls du echte APIs nutzen möchtest:
 npm install
-npm start
+npm run dev     # Entwicklung
+npm run build   # TypeScript kompilieren
+npm start       # Kompilierten Code ausführen
 ```
 
 #### 2. API-Keys konfigurieren (optional)

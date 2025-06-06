@@ -130,7 +130,7 @@ ENCRYPTION_KEY=your-encryption-key
 
 ### 4. System starten
 ```bash
-# Development Mode
+# Development Mode (TypeScript)
 npm run dev
 
 # Production Mode

@@ -4,10 +4,10 @@
   "description": "🎓 StudiFlow AI Enterprise - Intelligente Social Media Automation für Bildungsinhalte",
   "main": "index.html",
   "scripts": {
-    "start": "serve . -p 3001",
-    "dev": "live-server --port=3001 --open=index.html",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
     "serve": "python -m http.server 3001",
-    "build": "echo 'Frontend build complete - ready for production'",
+    "build": "tsc",
     "test": "echo 'Running tests...' && echo 'All tests passed ✅'",
     "lint": "eslint public/js/",
     "preview": "open http://localhost:3001",
@@ -56,7 +56,9 @@
     "live-server": "^1.2.2",
     "eslint": "^8.55.0",
     "prettier": "^3.1.0",
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.0.2",
+    "typescript": "^5.2.2",
+    "ts-node": "^10.9.1"
   },
   "optionalDependencies": {
     "openai": "^4.20.1",
