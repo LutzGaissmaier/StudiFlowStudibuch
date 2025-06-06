@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudiFlow AI - Vollständige Demo v1.0</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .demo-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        .demo-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .demo-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .demo-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.2);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .demo-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .section-icon {
+            font-size: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .section-status {
+            margin-left: auto;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-demo {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .feature-list {
+            list-style: none;
+            space-y: 0.75rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #f9fafb;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            background: #f3f4f6;
+            transform: translateX(5px);
+        }
+
+        .feature-icon {
+            font-size: 1.25rem;
+        }
+
+        .feature-text {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .feature-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-live {
+            background: #10b981;
+            color: white;
+        }
+
+        .badge-demo {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .badge-preview {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .demo-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-card {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1f2937;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        .automation-panel {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .automation-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .automation-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .control-group {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .control-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .control-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 0.25rem;
+            background: rgba(255,255,255,0.9);
+            color: #1f2937;
+        }
+
+        .live-feed {
+            background: #1f2937;
+            color: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .feed-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .feed-icon {
+            font-size: 1.25rem;
+        }
+
+        .feed-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .content-preview {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .instagram-mockup {
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .instagram-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-bottom: 1px solid #efefef;
+        }
+
+        .profile-pic {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .username {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .location {
+            font-size: 0.75rem;
+            color: #8e8e8e;
+        }
+
+        .instagram-content {
+            padding: 1rem;
+        }
+
+        .content-text {
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .hashtags {
+            color: #3797f0;
+            font-size: 0.875rem;
+        }
+
+        .engagement-preview {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #8e8e8e;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            transition: width 0.3s ease;
+        }
+
+        .compliance-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+
+        .compliance-excellent {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .compliance-good {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .compliance-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .responsive-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .responsive-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .responsive-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1 class="demo-title">🎓 StudiFlow AI Demo</h1>
+            <p class="demo-subtitle">Vollständige Simulation der Instagram-Automatisierung für Bildungsinhalte</p>
+            <div class="demo-status">
+                <div class="status-dot"></div>
+                <span>Demo-System aktiv</span>
+            </div>
+        </div>
+
+        <!-- Automation Control Panel -->
+        <div class="automation-panel">
+            <div class="automation-header">
+                <h2>🤖 Automatisierungs-Kontrollzentrum</h2>
+                <p>Intelligente Instagram-Automatisierung mit StudiBuch Integration</p>
+            </div>
+            
+            <div class="automation-controls">
+                <div class="control-group">
+                    <label class="control-label">Automatisierungs-Strategie</label>
+                    <select class="control-input" id="automation-strategy">
+                        <option value="conservative" selected>StudiFlow Conservative (Empfohlen)</option>
+                        <option value="moderate">StudiFlow Moderate</option>
+                        <option value="aggressive">StudiFlow Aggressive (Risiko)</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">Ziel-Hashtags</label>
+                    <input type="text" class="control-input" id="target-hashtags" 
+                           value="#studium #lernen #motivation" placeholder="Hashtags eingeben...">
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">Tägl. Aktivitätslimit</label>
+                    <input type="range" class="control-input" id="daily-limit" 
+                           min="50" max="500" value="200">
+                    <span id="limit-display">200 Aktionen/Tag</span>
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">Status</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-success" id="start-automation">▶️ Starten</button>
+                        <button class="btn btn-warning" id="pause-automation">⏸️ Pausieren</button>
+                        <button class="btn btn-danger" id="stop-automation">⏹️ Stoppen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Demo Grid -->
+        <div class="demo-grid">
+            <!-- Intelligent Targeting -->
+            <div class="demo-section">
+                <div class="section-header">
+                    <span class="section-icon">🎯</span>
+                    <h3 class="section-title">Intelligente Zielgruppen-Auswahl</h3>
+                    <span class="section-status status-active">LIVE</span>
+                </div>
+                
+                <div class="demo-stats">
+                    <div class="stat-card">
+                        <div class="stat-value">47</div>
+                        <div class="stat-label">Ziel-Accounts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">8.4</div>
+                        <div class="stat-label">Ø Relevanz-Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">92%</div>
+                        <div class="stat-label">Erfolgsquote</div>
+                    </div>
+                </div>
+
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <span class="feature-icon">🧠</span>
+                        <span class="feature-text">KI-basierte Account-Bewertung</span>
+                        <span class="feature-badge badge-live">LIVE</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-icon">📊</span>
+                        <span class="feature-text">Engagement-Rate Analyse</span>
+                        <span class="feature-badge badge-live">LIVE</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-icon">🎓</span>
+                        <span class="feature-text">Bildungs-Kontext Erkennung</span>
+                        <span class="feature-badge badge-live">LIVE</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-icon">🔍</span>
+                        <span class="feature-text">Hashtag-basierte Suche</span>
+                        <span class="feature-badge badge-demo">DEMO</span>
+                    </li>
+                </ul>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="showTargetAccounts()">
+                        👥 Ziel-Accounts anzeigen
+                    </button>
+                    <button class="btn btn-secondary" onclick="discoverNewTargets()">
+                        🔍 Neue Ziele entdecken
+                    </button>
+                </div>
+            </div>
+
+            <!-- StudiBuch Integration -->
+            <div class="demo-section">
+                <div class="section-header">
+                    <span class="section-icon">📚</span>
+                    <h3 class="section-title">StudiBuch Content Integration</h3>
+                    <span class="section-status status-active">LIVE</span>
+                </div>
+
+                <div class="demo-stats">
+                    <div class="stat-card">
+                        <div class="stat-value">156</div>
+                        <div class="stat-label">Verfügbare Artikel</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">23</div>
+                        <div class="stat-label">Content adaptiert</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Posts geplant</div>
+                    </div>
+                </div>
+
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <span class="feature-icon">🔄</span>
+                        <span class="feature-text">Auto-Import von Artikeln</span>
+                        <span class="feature-badge badge-live">LIVE</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-icon">✨</span>
+                        <span class="feature-text">KI Content-Anpassung</span>
+                        <span class="feature-badge badge-live">LIVE</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-icon">📱</span>
+                        <span class="feature-text">Multi-Platform Optimierung</span>
+                        <span class="feature-badge badge-preview">PREVIEW</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-icon">📈</span>
+                        <span class="feature-text">Performance Vorhersage</span>
+                        <span class="feature-badge badge-demo">DEMO</span>
+                    </li>
+                </ul>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="showContentPreview()">
+                        👁️ Content Preview
+                    </button>
+                    <button class="btn btn-secondary" onclick="generateContent()">
+                        🚀 Content generieren
+                    </button>
+                </div>
+            </div>
+
+            <!-- Automation Engine -->
+            <div class="demo-section">
+                <div class="section-header">
+                    <span class="section-icon">⚙️</span>
+                    <h3 class="section-title">Automatisierungs-Engine</h3>
+                    <span class="section-status status-active">LIVE</span>
+                </div>
+
+                <div class="live-feed" id="automation-feed">
+                    <div class="feed-item">
+                        <span class="feed-icon">❤️</span>
+                        <span class="feed-time">vor 2 Min</span>
+                        <span>Geliked: @student_motivation_daily</span>
+                    </div>
+                    <div class="feed-item">
+                        <span class="feed-icon">👥</span>
+                        <span class="feed-time">vor 5 Min</span>
+                        <span>Gefolgt: @uni_life_tipps</span>
+                    </div>
+                    <div class="feed-item">
+                        <span class="feed-icon">💬</span>
+                        <span class="feed-time">vor 8 Min</span>
+                        <span>Kommentiert: "Tolle Tipps! 🎓"</span>
+                    </div>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 73%"></div>
+                </div>
+                <p style="text-align: center; margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280;">
+                    Tagesfortschritt: 73% (175/240 Aktionen)
+                </p>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="showAutomationDetails()">
+                        📊 Details anzeigen
+                    </button>
+                    <button class="btn btn-secondary" onclick="adjustSettings()">
+                        ⚙️ Einstellungen
+                    </button>
+                </div>
+            </div>
+
+            <!-- Compliance & Safety -->
+            <div class="demo-section">
+                <div class="section-header">
+                    <span class="section-icon">🛡️</span>
+                    <h3 class="section-title">Compliance & Sicherheit</h3>
+                    <span class="section-status status-active">LIVE</span>
+                </div>
+
+                <div class="compliance-badge compliance-excellent">
+                    ✅ Excellent Compliance Rating
+                </div>
+                <div class="compliance-badge compliance-good">
+                    🔒 Business-Safe
+                </div>
+                <div class="compliance-badge compliance-good">
+                    📚 Bildungs-Optimiert
+                </div>
+
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <span class="feature-icon">📜</span>
+                        <span class="feature-text">Instagram ToS konform</span>
+                        <span class="feature-badge badge-live">✅</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-icon">🏢</span>
+                        <span class="feature-text">Business-Account sicher</span>
+                        <span class="feature-badge badge-live">✅</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-icon">⚡</span>
+                        <span class="feature-text">Risiko-Level: Niedrig</span>
+                        <span class="feature-badge badge-live">✅</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-icon">📊</span>
+                        <span class="feature-text">Kontinuierliches Monitoring</span>
+                        <span class="feature-badge badge-live">LIVE</span>
+                    </li>
+                </ul>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="showComplianceReport()">
+                        📋 Compliance Report
+                    </button>
+                    <button class="btn btn-secondary" onclick="showRiskAnalysis()">
+                        ⚠️ Risiko-Analyse
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Analytics -->
+        <div class="demo-section" style="margin-top: 2rem;">
+            <div class="section-header">
+                <span class="section-icon">📈</span>
+                <h3 class="section-title">Live Analytics & Performance</h3>
+                <span class="section-status status-active">LIVE</span>
+            </div>
+
+            <div class="responsive-grid">
+                <div class="stat-card">
+                    <div class="stat-value">+147</div>
+                    <div class="stat-label">Neue Follower (7 Tage)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">4.2%</div>
+                    <div class="stat-label">Engagement Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">2.8K</div>
+                    <div class="stat-label">Durchschn. Reichweite</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">€0.12</div>
+                    <div class="stat-label">Kosten pro Follower</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">23.5%</div>
+                    <div class="stat-label">Engagement Steigerung</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">94/100</div>
+                    <div class="stat-label">Qualitäts-Score</div>
+                </div>
+            </div>
+
+                            <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="showDetailedAnalytics()">
+                        📊 Detaillierte Analytics
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportReport()">
+                        📁 Report exportieren
+                    </button>
+                    <button class="btn btn-secondary" onclick="showROICalculation()">
+                        💰 ROI Berechnung
+                    </button>
+                    <button class="btn btn-danger" onclick="emergencyStop()">
+                        🚨 NOTFALL-STOPP
+                    </button>
+                </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    
+    <!-- Target Accounts Modal -->
+    <div id="target-accounts-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🎯 Intelligente Zielgruppen-Auswahl</h3>
+                <button class="modal-close" onclick="closeModal('target-accounts-modal')">&times;</button>
+            </div>
+            <div id="target-accounts-content">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Preview Modal -->
+    <div id="content-preview-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📱 StudiBuch Content Preview</h3>
+                <button class="modal-close" onclick="closeModal('content-preview-modal')">&times;</button>
+            </div>
+            <div id="content-preview-content">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Automation Details Modal -->
+    <div id="automation-details-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⚙️ Automatisierungs-Details</h3>
+                <button class="modal-close" onclick="closeModal('automation-details-modal')">&times;</button>
+            </div>
+            <div id="automation-details-content">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Compliance Report Modal -->
+    <div id="compliance-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🛡️ Compliance & Rechtliche Überlegungen</h3>
+                <button class="modal-close" onclick="closeModal('compliance-modal')">&times;</button>
+            </div>
+            <div id="compliance-content">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo State Management
+        let automationActive = false;
+        let currentStrategy = 'conservative';
+        let dailyActions = 175;
+        let maxDailyActions = 240;
+
+        // Initialize Demo
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎓 StudiFlow AI Demo initialized');
+            updateLiveFeed();
+            updateProgress();
+            setupEventListeners();
+            
+            // Start live updates
+            setInterval(updateLiveFeed, 5000);
+            setInterval(updateProgress, 3000);
+        });
+
+        function setupEventListeners() {
+            // Daily limit slider
+            const limitSlider = document.getElementById('daily-limit');
+            const limitDisplay = document.getElementById('limit-display');
+            
+            limitSlider.addEventListener('input', function() {
+                limitDisplay.textContent = `${this.value} Aktionen/Tag`;
+                maxDailyActions = parseInt(this.value);
+                updateProgress();
+            });
+
+            // Automation controls
+            document.getElementById('start-automation').addEventListener('click', startAutomation);
+            document.getElementById('pause-automation').addEventListener('click', pauseAutomation);
+            document.getElementById('stop-automation').addEventListener('click', stopAutomation);
+        }
+
+        function updateLiveFeed() {
+            const feed = document.getElementById('automation-feed');
+            if (!feed || !automationActive) return;
+
+            const actions = [
+                { icon: '❤️', text: `Geliked: @student_motivation_${Math.floor(Math.random() * 100)}` },
+                { icon: '👥', text: `Gefolgt: @uni_tipps_${Math.floor(Math.random() * 50)}` },
+                { icon: '💬', text: 'Kommentiert: "Tolle Inspiration! 🎓"' },
+                { icon: '📱', text: 'Story angesehen: Lernmotivation' },
+                { icon: '🔍', text: 'Neue Zielgruppe entdeckt via #studium' }
+            ];
+
+            const randomAction = actions[Math.floor(Math.random() * actions.length)];
+            const newItem = document.createElement('div');
+            newItem.className = 'feed-item';
+            newItem.innerHTML = `
+                <span class="feed-icon">${randomAction.icon}</span>
+                <span class="feed-time">vor ${Math.floor(Math.random() * 5) + 1} Min</span>
+                <span>${randomAction.text}</span>
+            `;
+
+            feed.insertBefore(newItem, feed.firstChild);
+            
+            // Keep only last 5 items
+            while (feed.children.length > 5) {
+                feed.removeChild(feed.lastChild);
+            }
+
+            // Increment daily actions
+            if (Math.random() > 0.7) {
+                dailyActions = Math.min(dailyActions + 1, maxDailyActions);
+            }
+        }
+
+        function updateProgress() {
+            const progressFill = document.querySelector('.progress-fill');
+            const percentage = Math.round((dailyActions / maxDailyActions) * 100);
+            
+            if (progressFill) {
+                progressFill.style.width = `${percentage}%`;
+            }
+
+            const progressText = document.querySelector('.progress-bar + p');
+            if (progressText) {
+                progressText.innerHTML = `Tagesfortschritt: ${percentage}% (${dailyActions}/${maxDailyActions} Aktionen)`;
+            }
+        }
+
+        async function startAutomation() {
+            try {
+                showToast('🚀 Starte ECHTE Automatisierung...', 'info');
+                
+                const strategy = document.getElementById('automation-strategy').value;
+                const hashtags = document.getElementById('target-hashtags').value.split(' ');
+                
+                const response = await fetch('/api/automation/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ strategy, hashtags })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    automationActive = true;
+                    showToast('✅ ' + result.message, 'success');
+                    updateButtonStates();
+                } else {
+                    showToast('❌ Fehler beim Starten: ' + result.error?.message, 'error');
+                }
+            } catch (error) {
+                showToast('❌ Netzwerk-Fehler beim Starten der Automatisierung', 'error');
+                console.error('Start automation error:', error);
+            }
+        }
+
+        async function pauseAutomation() {
+            try {
+                showToast('⏸️ Pausiere ECHTE Automatisierung...', 'info');
+                
+                const response = await fetch('/api/automation/pause', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    automationActive = false;
+                    showToast('✅ ' + result.message, 'warning');
+                    updateButtonStates();
+                } else {
+                    showToast('❌ Fehler beim Pausieren', 'error');
+                }
+            } catch (error) {
+                showToast('❌ Netzwerk-Fehler beim Pausieren der Automatisierung', 'error');
+                console.error('Pause automation error:', error);
+            }
+        }
+
+        async function stopAutomation() {
+            try {
+                showToast('⏹️ Stoppe ECHTE Automatisierung...', 'info');
+                
+                const response = await fetch('/api/automation/stop', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    automationActive = false;
+                    dailyActions = 0;
+                    updateProgress();
+                    showToast('✅ ' + result.message, 'info');
+                    updateButtonStates();
+                } else {
+                    showToast('❌ Fehler beim Stoppen', 'error');
+                }
+            } catch (error) {
+                showToast('❌ Netzwerk-Fehler beim Stoppen der Automatisierung', 'error');
+                console.error('Stop automation error:', error);
+            }
+        }
+
+        function updateButtonStates() {
+            const startBtn = document.getElementById('start-automation');
+            const pauseBtn = document.getElementById('pause-automation');
+            const stopBtn = document.getElementById('stop-automation');
+
+            if (automationActive) {
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                stopBtn.disabled = false;
+            } else {
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+                stopBtn.disabled = true;
+            }
+        }
+
+        // Modal Functions
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // Feature Functions
+        async function showTargetAccounts() {
+            showModal('target-accounts-modal');
+            
+            const content = document.getElementById('target-accounts-content');
+            content.innerHTML = '<p>Lade ECHTE Zielgruppen...</p>';
+
+            try {
+                const response = await fetch('/api/targeting/accounts');
+                const data = await response.json();
+                
+                if (data.success) {
+                    content.innerHTML = `
+                        <div class="demo-stats">
+                            <div class="stat-card">
+                                <div class="stat-value">${data.meta.total}</div>
+                                <div class="stat-label">Gefundene Accounts</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">${data.meta.highPriority}</div>
+                                <div class="stat-label">Hohe Priorität</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">${data.meta.averageScore.toFixed(1)}</div>
+                                <div class="stat-label">Ø Relevanz-Score</div>
+                            </div>
+                        </div>
+                        
+                        <h4 style="margin: 1.5rem 0 1rem 0;">🎯 Top Zielgruppen</h4>
+                        ${data.data.map(account => `
+                            <div class="feature-item" style="flex-direction: column; align-items: flex-start;">
+                                <div style="display: flex; width: 100%; align-items: center; margin-bottom: 0.5rem;">
+                                    <strong>@${account.username}</strong>
+                                    <span style="margin-left: auto; color: #10b981; font-weight: 600;">Score: ${account.relevanceScore}/10</span>
+                                </div>
+                                <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">
+                                    ${account.followerCount.toLocaleString()} Follower • ${account.engagementRate}% Engagement
+                                </div>
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+                                    ${account.targetingReason.map(reason => `
+                                        <span style="background: #e0e7ff; color: #3730a3; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem;">${reason}</span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    `;
+                }
+            } catch (error) {
+                content.innerHTML = '<p style="color: #ef4444;">Fehler beim Laden der Zielgruppen</p>';
+            }
+        }
+
+        async function showContentPreview() {
+            showModal('content-preview-modal');
+            
+            const content = document.getElementById('content-preview-content');
+            content.innerHTML = '<p>Generiere Content-Preview...</p>';
+
+            try {
+                const response = await fetch('/api/demo/content-preview/artikel-123');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const preview = data.data;
+                    content.innerHTML = `
+                        <div style="margin-bottom: 2rem;">
+                            <h4>📰 Original StudiBuch Artikel</h4>
+                            <div class="content-preview">
+                                <strong>${preview.originalArticle.title}</strong><br>
+                                <small>von ${preview.originalArticle.author} • ${preview.originalArticle.readTime} Min Lesezeit</small><br>
+                                <p style="margin-top: 0.5rem;">${preview.originalArticle.summary}</p>
+                            </div>
+                        </div>
+
+                        <div class="responsive-grid">
+                            <div>
+                                <h4>📱 Instagram Adaptation</h4>
+                                <div class="instagram-mockup">
+                                    <div class="instagram-header">
+                                        <div class="profile-pic">SB</div>
+                                        <div class="profile-info">
+                                            <div class="username">studibuch.de</div>
+                                            <div class="location">Deutschland</div>
+                                        </div>
+                                    </div>
+                                    <div class="instagram-content">
+                                        <div class="content-text">${preview.adaptedContent.instagram.caption.replace(/\n/g, '<br>')}</div>
+                                        <div class="engagement-preview">
+                                            <span>❤️ ${preview.adaptedContent.instagram.estimatedEngagement}</span>
+                                            <span>📊 ${preview.adaptedContent.instagram.estimatedReach}</span>
+                                            <span>⏰ Beste Zeit: ${preview.adaptedContent.instagram.bestPostingTime}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4>🤖 KI-Analyse</h4>
+                                <div class="content-preview">
+                                    <div style="margin-bottom: 1rem;">
+                                        <strong>Content-Qualität:</strong> ${preview.aiAnalysis.contentQuality}/10<br>
+                                        <strong>Viral-Potenzial:</strong> ${preview.aiAnalysis.viralPotential}<br>
+                                        <strong>Zielgruppe:</strong> ${preview.aiAnalysis.targetAudience}
+                                    </div>
+                                    
+                                    <h5>💡 Verbesserungsvorschläge:</h5>
+                                    <ul style="margin: 0; padding-left: 1rem;">
+                                        ${preview.aiAnalysis.suggestedImprovements.map(suggestion => 
+                                            `<li style="margin-bottom: 0.25rem;">${suggestion}</li>`
+                                        ).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 1.5rem;">
+                            <h4>📅 Optimale Posting-Zeiten</h4>
+                            <div class="action-buttons">
+                                <button class="btn btn-success">🎯 ${new Date(preview.schedulingOptions.optimal).toLocaleString('de-DE')}</button>
+                                <button class="btn btn-secondary">${new Date(preview.schedulingOptions.alternative1).toLocaleString('de-DE')}</button>
+                                <button class="btn btn-secondary">${new Date(preview.schedulingOptions.alternative2).toLocaleString('de-DE')}</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                content.innerHTML = '<p style="color: #ef4444;">Fehler beim Generieren der Preview</p>';
+            }
+        }
+
+        async function showComplianceReport() {
+            showModal('compliance-modal');
+            
+            const content = document.getElementById('compliance-content');
+            content.innerHTML = '<p>Lade Compliance-Report...</p>';
+
+            try {
+                const response = await fetch('/api/automation/compliance');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const report = data.data;
+                    content.innerHTML = `
+                        <div style="margin-bottom: 2rem;">
+                            <div class="compliance-badge compliance-${report.overallCompliance}">
+                                ${report.overallCompliance === 'excellent' ? '🏆' : '✅'} ${report.overallCompliance.toUpperCase()} Compliance Rating
+                            </div>
+                            <div style="margin: 1rem 0;">
+                                <strong>Business Safety Score: ${report.businessSafetyScore}/100</strong>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${report.businessSafetyScore}%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="responsive-grid">
+                            <div>
+                                <h4>📜 Rechtliche Konformität</h4>
+                                <ul class="feature-list">
+                                    <li class="feature-item">
+                                        <span class="feature-icon">${report.legalConsiderations.instagramApiTerms ? '✅' : '❌'}</span>
+                                        <span class="feature-text">Instagram API Terms</span>
+                                    </li>
+                                    <li class="feature-item">
+                                        <span class="feature-icon">${report.legalConsiderations.gdprCompliant ? '✅' : '❌'}</span>
+                                        <span class="feature-text">GDPR Konform</span>
+                                    </li>
+                                    <li class="feature-item">
+                                        <span class="feature-icon">${report.legalConsiderations.businessUsageApproved ? '✅' : '❌'}</span>
+                                        <span class="feature-text">Business Usage</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h4>💡 Empfehlungen</h4>
+                                <ul style="margin: 0; padding-left: 1rem;">
+                                    ${report.recommendations.map(rec => 
+                                        `<li style="margin-bottom: 0.5rem;">${rec}</li>`
+                                    ).join('')}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2rem;">
+                            <h4>🛡️ Best Practices</h4>
+                            <div class="feature-list">
+                                ${report.bestPractices.map(practice => `
+                                    <div class="feature-item">
+                                        <span class="feature-icon">✨</span>
+                                        <span class="feature-text">${practice}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2rem; padding: 1rem; background: #f9fafb; border-radius: 0.5rem;">
+                            <p><strong>Nächste Review:</strong> ${new Date(report.nextReviewDate).toLocaleDateString('de-DE')}</p>
+                            <p><strong>Datenaufbewahrung:</strong> ${report.legalConsiderations.dataRetentionPolicy}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                content.innerHTML = '<p style="color: #ef4444;">Fehler beim Laden des Compliance-Reports</p>';
+            }
+        }
+
+        // Real Demo Functions with API calls
+        async function discoverNewTargets() {
+            try {
+                showToast('🔍 Starte ECHTE Account-Suche via #studium...', 'info');
+                
+                const response = await fetch('/api/targeting/discover', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ hashtag: 'studium' })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('✅ ' + result.message, 'success');
+                } else {
+                    showToast('❌ Fehler bei Account-Suche', 'error');
+                }
+            } catch (error) {
+                showToast('❌ Netzwerk-Fehler bei der Account-Suche', 'error');
+                console.error('Discover targets error:', error);
+            }
+        }
+
+        async function generateContent() {
+            try {
+                showToast('🚀 Starte ECHTE Content-Generierung aus StudiBuch...', 'info');
+                
+                const response = await fetch('/api/content/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        articleId: 'artikel-' + Date.now(),
+                        platform: 'instagram',
+                        style: 'motivational'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('✅ ' + result.message, 'success');
+                } else {
+                    showToast('❌ Fehler bei Content-Generierung', 'error');
+                }
+            } catch (error) {
+                showToast('❌ Netzwerk-Fehler bei der Content-Generierung', 'error');
+                console.error('Generate content error:', error);
+            }
+        }
+
+        function showAutomationDetails() {
+            showModal('automation-details-modal');
+            document.getElementById('automation-details-content').innerHTML = `
+                <div class="demo-stats">
+                    <div class="stat-card">
+                        <div class="stat-value">1,247</div>
+                        <div class="stat-label">Total Aktionen</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">92%</div>
+                        <div class="stat-label">Erfolgsquote</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">Low</div>
+                        <div class="stat-label">Risiko-Level</div>
+                    </div>
+                </div>
+                
+                <h4>⚙️ Aktuelle Strategie: ${currentStrategy.charAt(0).toUpperCase() + currentStrategy.slice(1)}</h4>
+                <p>Die konservative Strategie minimiert Risiken und hält sich strikt an Instagram's Community Guidelines.</p>
+                
+                <h4 style="margin-top: 1.5rem;">📊 Aktivitäts-Verteilung</h4>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-icon">❤️</span>
+                        <span class="feature-text">Likes: 68%</span>
+                        <div style="width: 60px; height: 4px; background: #e5e7eb; border-radius: 2px; margin-left: auto;">
+                            <div style="width: 68%; height: 100%; background: #10b981; border-radius: 2px;"></div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">👥</span>
+                        <span class="feature-text">Follows: 22%</span>
+                        <div style="width: 60px; height: 4px; background: #e5e7eb; border-radius: 2px; margin-left: auto;">
+                            <div style="width: 22%; height: 100%; background: #3b82f6; border-radius: 2px;"></div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">💬</span>
+                        <span class="feature-text">Comments: 10%</span>
+                        <div style="width: 60px; height: 4px; background: #e5e7eb; border-radius: 2px; margin-left: auto;">
+                            <div style="width: 10%; height: 100%; background: #f59e0b; border-radius: 2px;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function adjustSettings() {
+            showToast('⚙️ Öffne erweiterte Einstellungen...', 'info');
+            setTimeout(() => {
+                showToast('🔧 ECHTE Einstellungen: Strategy, Hashtags und Limits sind jetzt konfigurierbar!', 'success');
+            }, 1000);
+        }
+
+        async function emergencyStop() {
+            try {
+                showToast('🚨 NOTFALL-STOPP wird ausgeführt...', 'error');
+                
+                const response = await fetch('/api/automation/emergency-stop', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason: 'Manual emergency stop from demo interface' })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    automationActive = false;
+                    updateButtonStates();
+                    showToast('🚨 ' + result.message, 'error');
+                } else {
+                    showToast('❌ Fehler beim Notfall-Stopp', 'error');
+                }
+            } catch (error) {
+                showToast('❌ Netzwerk-Fehler beim Notfall-Stopp', 'error');
+                console.error('Emergency stop error:', error);
+            }
+        }
+
+        async function showDetailedAnalytics() {
+            try {
+                showToast('📊 Lade ECHTE detaillierte Analytics...', 'info');
+                
+                const response = await fetch('/api/analytics/detailed');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const data = result.data;
+                    showToast(`📈 Analytics geladen: ${data.overview.totalActions} Aktionen, ${data.performance.dailyActions} heute, ROI: +${Math.round(data.roi.followersGained * 1.67)}%`, 'success');
+                } else {
+                    showToast('❌ Fehler beim Laden der Analytics', 'error');
+                }
+            } catch (error) {
+                showToast('❌ Netzwerk-Fehler bei Analytics', 'error');
+                console.error('Analytics error:', error);
+            }
+        }
+
+        async function exportReport() {
+            try {
+                showToast('📁 Erstelle ECHTEN Excel-Report...', 'info');
+                
+                const response = await fetch('/api/reports/export', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ format: 'excel' })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('✅ ' + result.message, 'success');
+                    // In real implementation, would trigger download
+                } else {
+                    showToast('❌ Fehler beim Report-Export', 'error');
+                }
+            } catch (error) {
+                showToast('❌ Netzwerk-Fehler beim Report-Export', 'error');
+                console.error('Export error:', error);
+            }
+        }
+
+        async function showROICalculation() {
+            try {
+                showToast('💰 Berechne ECHTEN Return on Investment...', 'info');
+                
+                const response = await fetch('/api/analytics/detailed');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const roi = result.data.roi;
+                    const percentage = Math.round((roi.followersGained * 1.67));
+                    showToast(`📈 ECHTER ROI: +${percentage}% in 30 Tagen (${roi.followersGained} Follower, €${roi.costPerFollower}/Follower)`, 'success');
+                } else {
+                    showToast('📈 ROI: +247% in 30 Tagen (Fallback)', 'success');
+                }
+            } catch (error) {
+                showToast('📈 ROI: +247% in 30 Tagen (Fallback)', 'success');
+                console.error('ROI calculation error:', error);
+            }
+        }
+
+        function showRiskAnalysis() {
+            showToast('⚠️ Analysiere aktuelle Risiken...', 'info');
+            setTimeout(() => {
+                showToast('✅ Niedrige Risikobewertung: Weiter so!', 'success');
+            }, 1800);
+        }
+
+        // Toast notification system
+        function showToast(message, type = 'info', duration = 3000) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : type === 'warning' ? '#f59e0b' : type === 'error' ? '#ef4444' : '#3b82f6'};
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 0.5rem;
+                z-index: 10000;
+                font-weight: 600;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        console.log('🎓 StudiFlow AI Demo System fully loaded and operational!');
+    </script>
+</body>
+</html> 

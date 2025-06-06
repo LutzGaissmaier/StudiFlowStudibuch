@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudiFlow AI - Button Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 6px;
+            background: #e7f3ff;
+            border-left: 4px solid #007bff;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+        .log-success { color: #28a745; }
+        .log-error { color: #dc3545; }
+        .log-info { color: #007bff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 StudiFlow AI - ECHTE Button Tests</h1>
+        
+        <div class="status">
+            <strong>Status:</strong> <span id="connection-status">Verbindung wird getestet...</span>
+        </div>
+
+        <h3>🤖 Automatisierungs-Kontrollen</h3>
+        <div class="button-grid">
+            <button class="btn btn-success" onclick="testStartAutomation()">
+                ▶️ Automatisierung Starten
+            </button>
+            <button class="btn btn-warning" onclick="testPauseAutomation()">
+                ⏸️ Automatisierung Pausieren
+            </button>
+            <button class="btn btn-secondary" onclick="testStopAutomation()">
+                ⏹️ Automatisierung Stoppen
+            </button>
+            <button class="btn btn-danger" onclick="testEmergencyStop()">
+                🚨 NOTFALL-STOPP
+            </button>
+        </div>
+
+        <h3>🎯 Zielgruppen & Content</h3>
+        <div class="button-grid">
+            <button class="btn btn-primary" onclick="testDiscoverTargets()">
+                🔍 Neue Zielgruppen entdecken
+            </button>
+            <button class="btn btn-primary" onclick="testGenerateContent()">
+                ✨ Content generieren
+            </button>
+            <button class="btn btn-secondary" onclick="testGetTargetAccounts()">
+                👥 Zielgruppen abrufen
+            </button>
+            <button class="btn btn-secondary" onclick="testContentPreview()">
+                📱 Content Preview
+            </button>
+        </div>
+
+        <h3>📊 Analytics & Reports</h3>
+        <div class="button-grid">
+            <button class="btn btn-primary" onclick="testGetAnalytics()">
+                📈 Analytics abrufen
+            </button>
+            <button class="btn btn-secondary" onclick="testExportReport()">
+                📁 Report exportieren
+            </button>
+            <button class="btn btn-secondary" onclick="testGetCompliance()">
+                🛡️ Compliance Report
+            </button>
+            <button class="btn btn-secondary" onclick="testGetAutomationStatus()">
+                ⚙️ Automation Status
+            </button>
+        </div>
+
+        <h3>🧪 System Tests</h3>
+        <div class="button-grid">
+            <button class="btn btn-primary" onclick="testAllEndpoints()">
+                🚀 ALLE Endpunkte testen
+            </button>
+            <button class="btn btn-secondary" onclick="clearLog()">
+                🗑️ Log löschen
+            </button>
+            <button class="btn btn-secondary" onclick="testConnection()">
+                🔌 Verbindung testen
+            </button>
+        </div>
+
+        <div class="log" id="log">
+            <div class="log-entry log-info">📋 Bereit für Tests. Klicken Sie auf einen Button...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+        
+        // Logging functions
+        function log(message, type = 'info') {
+            const logEl = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logEl.appendChild(entry);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+            log('Log gelöscht', 'info');
+        }
+
+        // Test connection
+        async function testConnection() {
+            try {
+                log('🔌 Teste Verbindung zu localhost:3001...', 'info');
+                const response = await fetch(`${API_BASE}/status`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    log('✅ Verbindung erfolgreich! System läuft.', 'success');
+                    document.getElementById('connection-status').textContent = 'VERBUNDEN ✅';
+                    document.getElementById('connection-status').parentElement.style.background = '#d4edda';
+                } else {
+                    log('❌ API antwortet, aber mit Fehler', 'error');
+                }
+            } catch (error) {
+                log('❌ Verbindungsfehler: ' + error.message, 'error');
+                document.getElementById('connection-status').textContent = 'FEHLER ❌';
+                document.getElementById('connection-status').parentElement.style.background = '#f8d7da';
+            }
+        }
+
+        // Automation tests
+        async function testStartAutomation() {
+            try {
+                log('🚀 Starte ECHTE Automatisierung...', 'info');
+                const response = await fetch(`${API_BASE}/automation/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        strategy: 'StudiFlow Conservative',
+                        hashtags: ['#studium', '#lernen', '#motivation']
+                    })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    log('✅ ' + result.message, 'success');
+                } else {
+                    log('❌ Start-Fehler: ' + (result.error?.message || 'Unbekannter Fehler'), 'error');
+                }
+            } catch (error) {
+                log('❌ Netzwerk-Fehler beim Starten: ' + error.message, 'error');
+            }
+        }
+
+        async function testPauseAutomation() {
+            try {
+                log('⏸️ Pausiere Automatisierung...', 'info');
+                const response = await fetch(`${API_BASE}/automation/pause`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    log('✅ ' + result.message, 'success');
+                } else {
+                    log('❌ Pause-Fehler: ' + (result.error?.message || 'Unbekannter Fehler'), 'error');
+                }
+            } catch (error) {
+                log('❌ Netzwerk-Fehler beim Pausieren: ' + error.message, 'error');
+            }
+        }
+
+        async function testStopAutomation() {
+            try {
+                log('⏹️ Stoppe Automatisierung...', 'info');
+                const response = await fetch(`${API_BASE}/automation/stop`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    log('✅ ' + result.message, 'success');
+                } else {
+                    log('❌ Stop-Fehler: ' + (result.error?.message || 'Unbekannter Fehler'), 'error');
+                }
+            } catch (error) {
+                log('❌ Netzwerk-Fehler beim Stoppen: ' + error.message, 'error');
+            }
+        }
+
+        async function testEmergencyStop() {
+            try {
+                log('🚨 NOTFALL-STOPP wird ausgeführt...', 'info');
+                const response = await fetch(`${API_BASE}/automation/emergency-stop`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason: 'Test von Button-Interface' })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    log('🚨 ' + result.message, 'success');
+                } else {
+                    log('❌ Emergency-Stop-Fehler: ' + (result.error?.message || 'Unbekannter Fehler'), 'error');
+                }
+            } catch (error) {
+                log('❌ Netzwerk-Fehler beim Notfall-Stopp: ' + error.message, 'error');
+            }
+        }
+
+        // Content tests
+        async function testDiscoverTargets() {
+            try {
+                log('🔍 Starte Account-Suche...', 'info');
+                const response = await fetch(`${API_BASE}/targeting/discover`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ hashtag: 'studium' })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    log('✅ ' + result.message, 'success');
+                    if (result.data) {
+                        log(`📊 Gefunden: ${result.data.newTargets || result.data.totalFound || 'Unbekannt'} neue Accounts`, 'info');
+                    }
+                } else {
+                    log('❌ Account-Suche-Fehler: ' + (result.error?.message || 'Unbekannter Fehler'), 'error');
+                }
+            } catch (error) {
+                log('❌ Netzwerk-Fehler bei Account-Suche: ' + error.message, 'error');
+            }
+        }
+
+        async function testGenerateContent() {
+            try {
+                log('✨ Starte Content-Generierung...', 'info');
+                const response = await fetch(`${API_BASE}/content/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        articleId: 'test-artikel-' + Date.now(),
+                        platform: 'instagram',
+                        style: 'motivational'
+                    })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    log('✅ ' + result.message, 'success');
+                    if (result.data) {
+                        log(`📝 Content ID: ${result.data.contentId || result.data.id}`, 'info');
+                    }
+                } else {
+                    log('❌ Content-Generierung-Fehler: ' + (result.error?.message || 'Unbekannter Fehler'), 'error');
+                }
+            } catch (error) {
+                log('❌ Netzwerk-Fehler bei Content-Generierung: ' + error.message, 'error');
+            }
+        }
+
+        async function testGetTargetAccounts() {
+            try {
+                log('👥 Lade Zielgruppen...', 'info');
+                const response = await fetch(`${API_BASE}/targeting/accounts`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    log('✅ Zielgruppen erfolgreich geladen', 'success');
+                    if (result.data && Array.isArray(result.data)) {
+                        log(`📊 ${result.data.length} Zielgruppen verfügbar`, 'info');
+                    }
+                    if (result.meta) {
+                        log(`📈 Durchschnittlicher Score: ${result.meta.averageScore?.toFixed(1)}`, 'info');
+                    }
+                } else {
+                    log('❌ Zielgruppen-Fehler: ' + (result.error?.message || 'Unbekannter Fehler'), 'error');
+                }
+            } catch (error) {
+                log('❌ Netzwerk-Fehler bei Zielgruppen: ' + error.message, 'error');
+            }
+        }
+
+        async function testContentPreview() {
+            try {
+                log('📱 Lade Content Preview...', 'info');
+                const response = await fetch(`${API_BASE}/demo/content-preview/test-artikel-123`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    log('✅ Content Preview erfolgreich geladen', 'success');
+                    if (result.data) {
+                        log(`📝 Original: ${result.data.originalArticle?.title}`, 'info');
+                        log(`📱 Platform: ${result.data.adaptedContent?.instagram ? 'Instagram verfügbar' : 'Keine Instagram-Daten'}`, 'info');
+                    }
+                } else {
+                    log('❌ Content-Preview-Fehler: ' + (result.error?.message || 'Unbekannter Fehler'), 'error');
+                }
+            } catch (error) {
+                log('❌ Netzwerk-Fehler bei Content Preview: ' + error.message, 'error');
+            }
+        }
+
+        // Analytics tests
+        async function testGetAnalytics() {
+            try {
+                log('📈 Lade Analytics...', 'info');
+                const response = await fetch(`${API_BASE}/analytics/detailed`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    log('✅ Analytics erfolgreich geladen', 'success');
+                    if (result.data) {
+                        const data = result.data;
+                        if (data.overview) {
+                            log(`📊 Sessions: ${data.overview.totalSessions}, Aktionen: ${data.overview.totalActions}`, 'info');
+                        }
+                        if (data.roi) {
+                            log(`💰 ROI: ${data.roi.followersGained} Follower, €${data.roi.costPerFollower}/Follower`, 'info');
+                        }
+                    }
+                } else {
+                    log('❌ Analytics-Fehler: ' + (result.error?.message || 'Unbekannter Fehler'), 'error');
+                }
+            } catch (error) {
+                log('❌ Netzwerk-Fehler bei Analytics: ' + error.message, 'error');
+            }
+        }
+
+        async function testExportReport() {
+            try {
+                log('📁 Exportiere Report...', 'info');
+                const response = await fetch(`${API_BASE}/reports/export`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ format: 'excel' })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    log('✅ ' + result.message, 'success');
+                    if (result.data) {
+                        log(`📄 Datei: ${result.data.filename}`, 'info');
+                    }
+                } else {
+                    log('❌ Export-Fehler: ' + (result.error?.message || 'Unbekannter Fehler'), 'error');
+                }
+            } catch (error) {
+                log('❌ Netzwerk-Fehler beim Export: ' + error.message, 'error');
+            }
+        }
+
+        async function testGetCompliance() {
+            try {
+                log('🛡️ Lade Compliance Report...', 'info');
+                const response = await fetch(`${API_BASE}/automation/compliance`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    log('✅ Compliance Report erfolgreich geladen', 'success');
+                    if (result.data) {
+                        log(`🏆 Rating: ${result.data.overallCompliance}, Score: ${result.data.businessSafetyScore}/100`, 'info');
+                    }
+                } else {
+                    log('❌ Compliance-Fehler: ' + (result.error?.message || 'Unbekannter Fehler'), 'error');
+                }
+            } catch (error) {
+                log('❌ Netzwerk-Fehler bei Compliance: ' + error.message, 'error');
+            }
+        }
+
+        async function testGetAutomationStatus() {
+            try {
+                log('⚙️ Lade Automation Status...', 'info');
+                const response = await fetch(`${API_BASE}/automation/status`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    log('✅ Automation Status erfolgreich geladen', 'success');
+                    if (result.data) {
+                        const status = result.data.isActive ? 'AKTIV' : 'INAKTIV';
+                        log(`🤖 Status: ${status}`, 'info');
+                        if (result.data.currentSession) {
+                            log(`📊 Session: ${result.data.currentSession.actionsCompleted} Aktionen`, 'info');
+                        }
+                    }
+                } else {
+                    log('❌ Status-Fehler: ' + (result.error?.message || 'Unbekannter Fehler'), 'error');
+                }
+            } catch (error) {
+                log('❌ Netzwerk-Fehler bei Status: ' + error.message, 'error');
+            }
+        }
+
+        // Test all endpoints
+        async function testAllEndpoints() {
+            log('🚀 Starte VOLLSTÄNDIGEN Endpunkt-Test...', 'info');
+            log('━'.repeat(50), 'info');
+            
+            const tests = [
+                { name: 'Verbindung', func: testConnection },
+                { name: 'Zielgruppen', func: testGetTargetAccounts },
+                { name: 'Content Preview', func: testContentPreview },
+                { name: 'Compliance', func: testGetCompliance },
+                { name: 'Analytics', func: testGetAnalytics },
+                { name: 'Automation Status', func: testGetAutomationStatus },
+                { name: 'Account-Suche', func: testDiscoverTargets },
+                { name: 'Content-Generierung', func: testGenerateContent },
+                { name: 'Report Export', func: testExportReport }
+            ];
+
+            for (let i = 0; i < tests.length; i++) {
+                const test = tests[i];
+                log(`[${i+1}/${tests.length}] Teste ${test.name}...`, 'info');
+                
+                try {
+                    await test.func();
+                } catch (error) {
+                    log(`❌ Test ${test.name} fehlgeschlagen: ${error.message}`, 'error');
+                }
+                
+                // Kurze Pause zwischen Tests
+                if (i < tests.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+            
+            log('━'.repeat(50), 'info');
+            log('🏁 Vollständiger Test beendet!', 'success');
+        }
+
+        // Auto-test connection on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            log('📋 Seite geladen. Teste automatisch Verbindung...', 'info');
+            testConnection();
+        });
+    </script>
+</body>
+</html> 
