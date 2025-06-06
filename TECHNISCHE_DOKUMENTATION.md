@@ -342,7 +342,9 @@ Der AI-Service ist verantwortlich für die Integration mit KI-Diensten wie OpenA
 
 5. Anwendung starten:
    ```
-   npm start
+   npm run dev        # Entwicklung
+   npm run build      # TypeScript kompilieren
+   npm start          # Kompilierten Code ausführen
    ```
 
 ### Entwicklung

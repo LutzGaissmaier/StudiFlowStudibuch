@@ -30,7 +30,11 @@ cd studiflow-ai
 # Dependencies installieren (nur beim ersten Mal)
 npm install
 
-# System starten
+# Entwicklung
+npm run dev
+
+# Produktion
+npm run build
 npm start
 ```
 

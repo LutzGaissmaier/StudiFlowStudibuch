@@ -264,7 +264,7 @@ curl -X GET http://localhost:3000/api/magazine/articles \
 4.  **Redis starten**: Stellen Sie sicher, dass Ihr Redis-Server läuft.
 5.  **Umgebungsvariablen konfigurieren**: Erstellen Sie eine `.env`-Datei im Stammverzeichnis (siehe unten).
 6.  **Datenbank initialisieren** (optional, falls Seeds vorhanden): `npm run seed`
-7.  **Anwendung starten**: `npm start` (Produktion) oder `npm run dev` (Entwicklung)
+7.  **Anwendung starten**: `npm run dev` (Entwicklung) oder nach `npm run build` mit `npm start` (Produktion)
 
 ### Konfiguration (Umgebungsvariablen)
 
@@ -310,9 +310,9 @@ LOG_LEVEL=info # debug, info, warn, error
 
 ### Starten der Anwendung
 
--   **Entwicklung**: `npm run dev` (startet mit Nodemon für Hot-Reloading)
--   **Produktion**: `npm start` (startet den kompilierten Code)
--   **Produktion mit PM2**: `npm run build && pm2 start dist/server.js --name studiflow`
+-   **Entwicklung**: `npm run dev` (TypeScript via ts-node)
+-   **Produktion**: `npm run build && npm start`
+-   **Produktion mit PM2**: `npm run build && pm2 start dist/index.js --name studiflow`
 
 ### Deployment-Strategien
 

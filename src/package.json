@@ -4,9 +4,9 @@
   "description": "StudiFlow AI Enterprise - Integrierte Lösung für Content-Management und Social Media Automatisierung",
   "main": "src/main.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "build": "webpack --mode production",
+    "start": "node ../dist/index.js",
+    "dev": "ts-node index.ts",
+    "build": "tsc",
     "test": "jest"
   },
   "author": "StudiBuch",
@@ -45,6 +45,8 @@
     "style-loader": "^3.3.3",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1"
+    "webpack-dev-server": "^4.15.1",
+    "typescript": "^5.2.2",
+    "ts-node": "^10.9.1"
   }
 }
