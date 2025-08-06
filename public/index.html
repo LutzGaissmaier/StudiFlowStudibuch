@@ -3,211 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudiFlow AI - Enterprise Dashboard v1.0</title>
-    <link rel="stylesheet" href="/css/main.css">
-    <link rel="manifest" href="/manifest.json">
-    <style>
-        .dashboard-selector {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            padding: 1rem 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            z-index: 1000;
-            display: flex;
-            gap: 1rem;
-            border: 2px solid #e5e7eb;
-        }
-        
-        .dashboard-option {
-            padding: 0.75rem 1.5rem;
-            background: #f3f4f6;
-            color: #374151;
-            text-decoration: none;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-        
-        .dashboard-option.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-        }
-        
-        .dashboard-option:hover:not(.active) {
-            background: #e5e7eb;
-            transform: translateY(-1px);
-        }
-        
-        .marketing-highlight {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 1rem;
-            margin: 2rem 0;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        
-        .marketing-highlight h3 {
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-        }
-        
-        .marketing-highlight p {
-            margin-bottom: 1.5rem;
-            opacity: 0.9;
-        }
-        
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
-        }
-        
-        .dashboard-card {
-            background: white;
-            border-radius: 1rem;
-            padding: 2rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border: 2px solid #f3f4f6;
-            transition: all 0.3s ease;
-        }
-        
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            border-color: #e5e7eb;
-        }
-        
-        .dashboard-card h3 {
-            color: #1f2937;
-            margin-bottom: 1rem;
-            font-size: 1.25rem;
-        }
-        
-        .dashboard-card p {
-            color: #6b7280;
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-        }
-        
-        .feature-list {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .feature-list li {
-            padding: 0.5rem 0;
-            color: #4b5563;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .feature-list li::before {
-            content: '✅';
-            font-size: 1rem;
-        }
-        
-        .btn-dashboard {
-            display: inline-block;
-            padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            text-align: center;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .btn-dashboard:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-        }
-        
-        .btn-secondary {
-            background: #f3f4f6;
-            color: #374151;
-        }
-        
-        .btn-secondary:hover {
-            background: #e5e7eb;
-        }
-        
-        .system-status {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: white;
-            padding: 1rem 1.5rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            z-index: 100;
-        }
-        
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #10b981;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        .hide-after-load {
-            animation: fadeOut 0.5s ease-out 8s forwards;
-        }
-        
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translateX(-50%) translateY(0); }
-            to { opacity: 0; transform: translateX(-50%) translateY(-100%); }
-        }
-    </style>
-</head>
-<body>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StudiFlow AI - Unified Dashboard</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
     <script>
+        // Redirect to unified dashboard
         window.location.href = '/unified-dashboard.html';
     </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .loading-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .loading-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .loading-content p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+        .loading-content a {
+            color: white;
+            text-decoration: underline;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <div style="display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center;">
-        <div>
+    <div class="loading-container">
+        <div class="loading-content">
+            <div class="spinner"></div>
             <h1>🎓 StudiFlow AI</h1>
             <p>Weiterleitung zum Unified Dashboard...</p>
             <p><a href="/unified-dashboard.html">Hier klicken falls die Weiterleitung nicht funktioniert</a></p>
         </div>
     </div>
 </body>
-</html>
+</html></old_str>
+
 
     <!-- Loading Screen -->
     <div id="loading-screen" style="display: none;" class="modal-backdrop">
@@ -2052,4 +1909,4 @@
     <script src="/js/app.js" defer></script>
     <script src="/js/modal-fixes.js" defer></script>
 </body>
-</html>      
+</html>        
