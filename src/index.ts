@@ -25,7 +25,7 @@ import { HealthMonitor } from './core/health';
 // Import business services
 import { StudiBuchMagazineService } from './services/studibuch-magazine';
 import { SchedulerService } from './services/scheduler';
-import { RealAutomationService } from './services/real-automation-service';
+import { InstagramAutomationDemoService } from './services/instagram-automation-demo';
 import { SimplifiedInstagramService } from './services/instagram/simplified';
 import { AIAgentService } from './services/ai/agent';
 import { createAPIRoutes } from './api/index';
@@ -88,8 +88,7 @@ class StudiFlowAIEnterpriseApp {
   private healthMonitor!: HealthMonitor;
   private instagramService!: SimplifiedInstagramService;
   private aiService!: AIAgentService;
-  private realAutomationService = new RealAutomationService();
-  private scrapingService = new MockService('🕷️ Scraping Service');
+  private automationService = new InstagramAutomationDemoService();
   private contentService = new MockService('📝 Content Service');
   
   // Real services
@@ -147,6 +146,7 @@ class StudiFlowAIEnterpriseApp {
         directives: {
           defaultSrc: ["'self'"],
           scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+          scriptSrcAttr: ["'unsafe-inline'"],
           styleSrc: ["'self'", "'unsafe-inline'"],
           imgSrc: ["'self'", "data:", "https:", "http:"],
           connectSrc: ["'self'", "ws:", "wss:"],
@@ -238,18 +238,17 @@ class StudiFlowAIEnterpriseApp {
       );
       await this.instagramService.initialize();
       
-      await this.scrapingService.initialize();
       await this.contentService.initialize();
       await this.schedulerService.initialize();
       
       // Initialize StudiBuch Magazine Service
       await this.magazineService.initialize();
       
-      // Initialize Real Automation Service
-      await this.realAutomationService.initialize();
+      // Initialize Automation Service
+      await this.automationService.initialize();
       
       // Make services globally available for API routes
-      (global as any).realAutomationService = this.realAutomationService;
+      (global as any).automationService = this.automationService;
       (global as any).aiService = this.aiService;
       (global as any).instagramService = this.instagramService;
       (global as any).healthMonitor = this.healthMonitor;
@@ -490,14 +489,13 @@ class StudiFlowAIEnterpriseApp {
         // Shutdown services
         await this.schedulerService.shutdown();
         await this.contentService.shutdown();
-        await this.scrapingService.shutdown();
         if (this.instagramService) {
           await this.instagramService.shutdown();
         }
         if (this.aiService) {
           await this.aiService.shutdown();
         }
-        await this.realAutomationService.emergencyStop('System shutdown');
+        await this.automationService.emergencyStop('System shutdown');
         if (this.healthMonitor) {
           await this.healthMonitor.shutdown();
         }
@@ -609,4 +607,4 @@ if (require.main === module) {
   });
 }
 
-export default StudiFlowAIEnterpriseApp;                          
+export default StudiFlowAIEnterpriseApp;                                
