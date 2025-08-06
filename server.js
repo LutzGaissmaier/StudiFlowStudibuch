@@ -69,6 +69,23 @@ const upload = multer({ storage: storage });
 // API-Routen
 const apiRouter = express.Router();
 
+function filterAndLimit(items, filters, limit) {
+  let filteredItems = items.filter(item => {
+    for (const [key, value] of Object.entries(filters)) {
+      if (value !== undefined && value !== null && item[key] !== value) {
+        return false;
+      }
+    }
+    return true;
+  });
+  
+  if (limit) {
+    filteredItems = filteredItems.slice(0, parseInt(limit));
+  }
+  
+  return filteredItems;
+}
+
 // Authentifizierung
 apiRouter.post('/auth/login', (req, res) => {
   const { username, password } = req.body;
@@ -470,21 +487,7 @@ apiRouter.get('/content/items', authenticateToken, (req, res) => {
     }
   ];
   
-  // Filtere nach Typ, wenn angegeben
-  let filteredItems = contentItems;
-  if (type) {
-    filteredItems = contentItems.filter(item => item.type === type);
-  }
-  
-  // Filtere nach Status, wenn angegeben
-  if (status) {
-    filteredItems = filteredItems.filter(item => item.status === status);
-  }
-  
-  // Begrenze die Anzahl der Items, wenn angegeben
-  if (limit) {
-    filteredItems = filteredItems.slice(0, parseInt(limit));
-  }
+  const filteredItems = filterAndLimit(contentItems, { type, status }, limit);
   
   res.json({
     success: true,
@@ -747,16 +750,7 @@ apiRouter.get('/activities', authenticateToken, (req, res) => {
     }
   ];
   
-  // Filtere nach Typ, wenn angegeben
-  let filteredActivities = activities;
-  if (type) {
-    filteredActivities = activities.filter(activity => activity.type === type);
-  }
-  
-  // Begrenze die Anzahl der Aktivitäten, wenn angegeben
-  if (limit) {
-    filteredActivities = filteredActivities.slice(0, parseInt(limit));
-  }
+  const filteredActivities = filterAndLimit(activities, { type }, limit);
   
   res.json({
     success: true,
