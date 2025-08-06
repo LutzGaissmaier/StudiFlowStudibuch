@@ -47,7 +47,9 @@ class RionaAI extends EventEmitter {
                 likes: 100,
                 comments: 15,
                 shares: 5
-            }
+            },
+            automationEnabled: true,
+            aiAgentEnabled: true
         };
         
         this.init();
@@ -109,6 +111,31 @@ class RionaAI extends EventEmitter {
             this.analytics = new AnalyticsEngine();
             this.systemHealth.components.analytics = 'healthy';
             logger.info('📊 Analytics Engine online');
+            
+            const geminiApiKeys = this.getGeminiApiKeys();
+            if (geminiApiKeys.length > 0) {
+                const { AIAgentService } = await import('../services/ai/agent.js');
+                this.aiAgent = new AIAgentService(geminiApiKeys);
+                this.systemHealth.components.aiAgent = 'healthy';
+                logger.info('🤖 AI Agent Service online');
+            } else {
+                logger.warn('⚠️ No Gemini API keys found, AI Agent Service disabled');
+            }
+            
+            const automationCredentials = this.getInstagramAutomationCredentials();
+            if (automationCredentials && this.aiAgent) {
+                const { InstagramAutomationService } = await import('../services/instagram/automation.js');
+                this.instagramAutomation = new InstagramAutomationService(
+                    this.instagramCredentials, 
+                    automationCredentials, 
+                    this.aiAgent
+                );
+                await this.instagramAutomation.initialize();
+                this.systemHealth.components.instagramAutomation = 'healthy';
+                logger.info('📱 Instagram Automation Service online');
+            } else {
+                logger.warn('⚠️ Instagram automation credentials not found or AI Agent unavailable');
+            }
             
             this.systemHealth.overall = 'healthy';
             this.systemHealth.lastCheck = new Date().toISOString();
@@ -672,6 +699,27 @@ class RionaAI extends EventEmitter {
         this.emit('configUpdated', this.config);
     }
 
+    getGeminiApiKeys() {
+        const keys = [];
+        for (let i = 1; i <= 50; i++) {
+            const key = process.env[`GEMINI_API_KEY_${i}`];
+            if (key && key !== `API_KEY_${i}`) {
+                keys.push(key);
+            }
+        }
+        return keys;
+    }
+
+    getInstagramAutomationCredentials() {
+        const username = process.env.IGusername;
+        const password = process.env.IGpassword;
+        
+        if (username && password && username !== 'default_IGusername' && password !== 'default_IGpassword') {
+            return { username, password };
+        }
+        return null;
+    }
+
     // System stoppen
     async shutdown() {
         try {
@@ -681,6 +729,10 @@ class RionaAI extends EventEmitter {
             
             // Stoppe alle Intervalle
             // (würde alle Timer clearen)
+            
+            if (this.instagramAutomation) {
+                await this.instagramAutomation.shutdown();
+            }
             
             // Speichere finale Daten
             await this.contentPipeline?.savePipelineData();
@@ -695,4 +747,4 @@ class RionaAI extends EventEmitter {
     }
 }
 
-module.exports = RionaAI; 
+module.exports = RionaAI;    
