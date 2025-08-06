@@ -186,134 +186,241 @@
     </style>
 </head>
 <body>
-    <div class="dashboard-selector hide-after-load">
-        <a href="/index.html" class="dashboard-option active">🚀 Enterprise Dashboard</a>
-        <a href="/marketing-dashboard.html" class="dashboard-option">📚 Marketing Dashboard</a>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudiFlow AI - Unified Dashboard</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
+    <script>
+        window.location.href = '/unified-dashboard.html';
+    </script>
+</head>
+<body>
+    <div style="display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center;">
+        <div>
+            <h1>🎓 StudiFlow AI</h1>
+            <p>Weiterleitung zum Unified Dashboard...</p>
+            <p><a href="/unified-dashboard.html">Hier klicken falls die Weiterleitung nicht funktioniert</a></p>
+        </div>
     </div>
+</body>
+</html>
 
-    <div id="loading-screen" class="loading-screen">
-        <div class="loading-spinner">
-            <div class="spinner"></div>
-            <p>Lade Riona AI System...</p>
+    <!-- Loading Screen -->
+    <div id="loading-screen" style="display: none;" class="modal-backdrop">
+        <div class="modal">
+            <div class="modal-body text-center">
+                <div class="loading-spinner"></div>
+                <p>Lade StudiFlow AI System...</p>
+            </div>
         </div>
     </div>
 
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo-section">
-                    <div class="brand">
-                        <h1 class="brand-title">🎓 StudiFlow AI Enterprise</h1>
-                        <p class="brand-subtitle">Intelligente Social Media Automation für Bildungsinhalte</p>
-                    </div>
-                </div>
-                
-                <nav class="nav">
-                    <ul class="nav-list">
-                        <li><a href="#dashboard" class="nav-link active" data-section="dashboard">📊 Dashboard</a></li>
-                        <li><a href="/marketing-dashboard.html" class="nav-link" style="background: #4f46e5; color: white; border-radius: 0.5rem;">📰 Marketing Dashboard</a></li>
-                        <li><a href="#magazine" class="nav-link" data-section="magazine">📰 StudiBuch Magazin</a></li>
-                        <li><a href="#content" class="nav-link" data-section="content">📝 Content</a></li>
-                        <li><a href="#posts" class="nav-link" data-section="posts">📱 Posts</a></li>
-                        <li><a href="#engagement" class="nav-link" data-section="engagement">❤️ Engagement</a></li>
-                        <li><a href="#analytics" class="nav-link" data-section="analytics">📈 Analytics</a></li>
-                        <li><a href="#settings" class="nav-link" data-section="settings">⚙️ Settings</a></li>
-                    </ul>
-                </nav>
-
-                <div class="header-actions">
-                    <div class="system-status" id="header-status">
-                        <span class="status-indicator"></span>
-                        <span class="status-text">Verbinde...</span>
-                    </div>
-                    <button class="btn btn-primary" id="refresh-all">🔄 Aktualisieren</button>
-                </div>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <a href="/" class="header-brand">
+            <div class="header-brand-icon">🎓</div>
+            <div>
+                <div>StudiFlow AI Enterprise</div>
+                <small style="font-size: var(--font-size-sm); font-weight: var(--font-weight-normal); opacity: 0.8;">Intelligente Social Media Automation</small>
             </div>
+        </a>
+        
+        <div class="header-nav">
+            <a href="/marketing-dashboard.html" class="btn btn-secondary btn-sm">📊 Marketing Dashboard</a>
+        </div>
+
+        <div class="header-actions">
+            <div class="badge badge-success" id="header-status">
+                <span>●</span>
+                <span class="status-text">Verbinde...</span>
+            </div>
+            <button class="btn btn-primary btn-sm" id="refresh-all">🔄 Aktualisieren</button>
         </div>
     </header>
 
-    <main class="main">
-        <div class="container">
-            
-            <!-- Dashboard Section -->
-            <section id="dashboard-section" class="section active">
-                <div class="section-header">
-                    <h2 class="section-title">📊 System Dashboard</h2>
-                </div>
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-section">
+            <h3 class="sidebar-title">Navigation</h3>
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="sidebar-nav-item active" data-section="dashboard">
+                    <span class="sidebar-nav-icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="#magazine" class="sidebar-nav-item" data-section="magazine">
+                    <span class="sidebar-nav-icon">📰</span>
+                    StudiBuch Magazin
+                </a>
+                <a href="#content" class="sidebar-nav-item" data-section="content">
+                    <span class="sidebar-nav-icon">📝</span>
+                    Content
+                </a>
+                <a href="#posts" class="sidebar-nav-item" data-section="posts">
+                    <span class="sidebar-nav-icon">📱</span>
+                    Posts
+                </a>
+                <a href="#engagement" class="sidebar-nav-item" data-section="engagement">
+                    <span class="sidebar-nav-icon">❤️</span>
+                    Engagement
+                </a>
+                <a href="#analytics" class="sidebar-nav-item" data-section="analytics">
+                    <span class="sidebar-nav-icon">📈</span>
+                    Analytics
+                </a>
+                <a href="#settings" class="sidebar-nav-item" data-section="settings">
+                    <span class="sidebar-nav-icon">⚙️</span>
+                    Settings
+                </a>
+            </nav>
+        </div>
+    </aside>
 
-                <div class="marketing-highlight">
-                    <h3>🎯 Neu: Marketing Dashboard verfügbar!</h3>
-                    <p>Das speziell für Marketing-Mitarbeiter entwickelte Dashboard bietet eine benutzerfreundliche Oberfläche für die tägliche Content-Verwaltung und Instagram-Automation.</p>
-                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                        <a href="/marketing-dashboard.html" class="btn-dashboard">📚 Marketing Dashboard öffnen</a>
-                        <button onclick="showMarketingFeatures()" class="btn-dashboard btn-secondary">ℹ️ Features ansehen</button>
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="section active">
+            <div class="main-header">
+                <h1 class="main-title">📊 System Dashboard</h1>
+                <p class="main-subtitle">Überblick über alle StudiFlow AI Enterprise Funktionen</p>
+            </div>
+
+            <!-- Marketing Dashboard Highlight -->
+            <div class="card" style="background: var(--gradient-primary); color: white; margin-bottom: var(--space-8);">
+                <div class="card-body text-center">
+                    <h3 style="color: white; margin-bottom: var(--space-4);">🎯 Neu: Marketing Dashboard verfügbar!</h3>
+                    <p style="color: white; opacity: 0.9; margin-bottom: var(--space-6);">Das speziell für Marketing-Mitarbeiter entwickelte Dashboard bietet eine benutzerfreundliche Oberfläche für die tägliche Content-Verwaltung und Instagram-Automation.</p>
+                    <div class="flex gap-4 justify-center">
+                        <a href="/marketing-dashboard.html" class="btn btn-secondary">📚 Marketing Dashboard öffnen</a>
+                        <button onclick="showMarketingFeatures()" class="btn btn-outline" style="color: white; border-color: white;">ℹ️ Features ansehen</button>
                     </div>
                 </div>
+            </div>
 
-                <div class="dashboard-grid">
-                    <div class="dashboard-card">
+            <!-- Dashboard Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="card">
+                    <div class="card-header">
                         <h3>📚 Marketing Dashboard</h3>
+                    </div>
+                    <div class="card-body">
                         <p>Optimiert für Marketing-Mitarbeiter mit intuitive Bedienung und praxisorientierten Features.</p>
-                        <ul class="feature-list">
-                            <li>Live Content Pipeline Management</li>
-                            <li>Ein-Klick Genehmigungsworkflow</li>
-                            <li>Real-time Engagement Monitoring</li>
-                            <li>Performance Analytics</li>
-                            <li>Alert-System</li>
+                        <ul style="list-style: none; padding: 0; margin: var(--space-4) 0;">
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Live Content Pipeline Management
+                            </li>
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Ein-Klick Genehmigungsworkflow
+                            </li>
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Real-time Engagement Monitoring
+                            </li>
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Performance Analytics
+                            </li>
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Alert-System
+                            </li>
                         </ul>
-                        <a href="/marketing-dashboard.html" class="btn-dashboard" style="width: 100%; margin-top: 1rem;">Jetzt nutzen →</a>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <h3>🚀 Enterprise Dashboard</h3>
-                        <p>Technisches Dashboard für Systemadministratoren und Developer mit erweiterten Funktionen.</p>
-                        <ul class="feature-list">
-                            <li>Vollständige Systemkonfiguration</li>
-                            <li>API Management</li>
-                            <li>Erweiterte Analytics</li>
-                            <li>Debugging Tools</li>
-                            <li>Entwickler-Features</li>
-                        </ul>
-                        <button onclick="showTechnicalFeatures()" class="btn-dashboard btn-secondary" style="width: 100%; margin-top: 1rem;">Features erkunden</button>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <h3>📱 Instagram Integration</h3>
-                        <p>Vollständige Instagram-Automation mit intelligenten Algorithmen und Sicherheitsfeatures.</p>
-                        <ul class="feature-list">
-                            <li>Automatisches Posten</li>
-                            <li>Smart Engagement</li>
-                            <li>Hashtag-Optimierung</li>
-                            <li>Account-Sicherheit</li>
-                            <li>Performance-Tracking</li>
-                        </ul>
-                        <button onclick="checkInstagramStatus()" class="btn-dashboard btn-secondary" style="width: 100%; margin-top: 1rem;">Status prüfen</button>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <h3>🤖 AI Content Generation</h3>
-                        <p>KI-gestützte Content-Erstellung basierend auf StudiBuch Magazine Artikeln.</p>
-                        <ul class="feature-list">
-                            <li>Automatische Content-Anpassung</li>
-                            <li>Multi-Format Unterstützung</li>
-                            <li>Zielgruppen-Optimierung</li>
-                            <li>Hashtag-Generierung</li>
-                            <li>A/B Testing</li>
-                        </ul>
-                        <button onclick="testAIGeneration()" class="btn-dashboard btn-secondary" style="width: 100%; margin-top: 1rem;">AI testen</button>
+                        <a href="/marketing-dashboard.html" class="btn btn-primary w-full">Jetzt nutzen →</a>
                     </div>
                 </div>
 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">📱</div>
-                        <div class="stat-content">
-                            <div class="stat-value" id="total-posts">--</div>
-                            <div class="stat-label">Total Posts</div>
-                        </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🚀 Enterprise Dashboard</h3>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">👥</div>
+                    <div class="card-body">
+                        <p>Technisches Dashboard für Systemadministratoren und Developer mit erweiterten Funktionen.</p>
+                        <ul style="list-style: none; padding: 0; margin: var(--space-4) 0;">
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Vollständige Systemkonfiguration
+                            </li>
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> API Management
+                            </li>
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Erweiterte Analytics
+                            </li>
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Debugging Tools
+                            </li>
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Entwickler-Features
+                            </li>
+                        </ul>
+                        <button onclick="showTechnicalFeatures()" class="btn btn-outline w-full">Features erkunden</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📱 Instagram Integration</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Vollständige Instagram-Automation mit intelligenten Algorithmen und Sicherheitsfeatures.</p>
+                        <ul style="list-style: none; padding: 0; margin: var(--space-4) 0;">
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Automatisches Posten
+                            </li>
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Smart Engagement
+                            </li>
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Hashtag-Optimierung
+                            </li>
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Account-Sicherheit
+                            </li>
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Performance-Tracking
+                            </li>
+                        </ul>
+                        <button onclick="checkInstagramStatus()" class="btn btn-outline w-full">Status prüfen</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🤖 AI Content Generation</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>KI-gestützte Content-Erstellung basierend auf StudiBuch Magazine Artikeln.</p>
+                        <ul style="list-style: none; padding: 0; margin: var(--space-4) 0;">
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Automatische Content-Anpassung
+                            </li>
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Multi-Format Unterstützung
+                            </li>
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Zielgruppen-Optimierung
+                            </li>
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> Hashtag-Generierung
+                            </li>
+                            <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-2);">
+                                <span>✅</span> A/B Testing
+                            </li>
+                        </ul>
+                        <button onclick="testAIGeneration()" class="btn btn-outline w-full">AI testen</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-posts">--</div>
+                    <div class="stat-label">📱 Total Posts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-followers">--</div>
+                    <div class="stat-label">👥 Followers</div>
                         <div class="stat-content">
                             <div class="stat-value" id="total-followers">--</div>
                             <div class="stat-label">Follower</div>
@@ -1945,4 +2052,4 @@
     <script src="/js/app.js" defer></script>
     <script src="/js/modal-fixes.js" defer></script>
 </body>
-</html> 
+</html>      

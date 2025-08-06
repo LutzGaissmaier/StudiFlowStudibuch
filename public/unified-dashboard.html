@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudiFlow AI - Unified Dashboard</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
+</head>
+<body class="dashboard-layout">
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" style="display: none;" class="loading-screen">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Lade StudiFlow AI System...</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="dashboard-header">
+        <a href="/unified-dashboard.html" class="header-brand">
+            <div class="header-brand-icon">🎓</div>
+            <div>
+                <div>StudiFlow AI</div>
+                <small style="font-size: var(--font-size-sm); font-weight: var(--font-weight-normal); opacity: 0.8;">Unified Dashboard - Enterprise & Marketing</small>
+            </div>
+        </a>
+        
+        <div class="header-nav">
+            <div class="badge badge-info">One Dashboard</div>
+        </div>
+
+        <div class="header-actions">
+            <div class="badge badge-success" id="header-status">
+                <span>●</span>
+                <span class="status-text">Verbinde...</span>
+            </div>
+            <button class="btn btn-primary btn-sm" id="refresh-all">🔄 Aktualisieren</button>
+            <button class="btn btn-error btn-sm" id="emergency-stop">🛑 Notfall-Stop</button>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-section">
+            <h3 class="sidebar-title">Dashboard</h3>
+            <nav class="sidebar-nav">
+                <a href="#overview" class="sidebar-nav-item active" data-section="overview">
+                    <span class="sidebar-nav-icon">📊</span>
+                    Überblick
+                </a>
+                <a href="#content-pipeline" class="sidebar-nav-item" data-section="content-pipeline">
+                    <span class="sidebar-nav-icon">📝</span>
+                    Content Pipeline
+                </a>
+                <a href="#magazine" class="sidebar-nav-item" data-section="magazine">
+                    <span class="sidebar-nav-icon">📰</span>
+                    StudiBuch Magazin
+                </a>
+            </nav>
+        </div>
+        
+        <div class="sidebar-section">
+            <h3 class="sidebar-title">Instagram</h3>
+            <nav class="sidebar-nav">
+                <a href="#posts" class="sidebar-nav-item" data-section="posts">
+                    <span class="sidebar-nav-icon">📱</span>
+                    Posts & Content
+                </a>
+                <a href="#engagement" class="sidebar-nav-item" data-section="engagement">
+                    <span class="sidebar-nav-icon">❤️</span>
+                    Engagement Live
+                </a>
+                <a href="#analytics" class="sidebar-nav-item" data-section="analytics">
+                    <span class="sidebar-nav-icon">📈</span>
+                    Analytics
+                </a>
+            </nav>
+        </div>
+        
+        <div class="sidebar-section">
+            <h3 class="sidebar-title">System</h3>
+            <nav class="sidebar-nav">
+                <a href="#alerts" class="sidebar-nav-item" data-section="alerts">
+                    <span class="sidebar-nav-icon">🚨</span>
+                    Alerts & Monitoring
+                </a>
+                <a href="#settings" class="sidebar-nav-item" data-section="settings">
+                    <span class="sidebar-nav-icon">⚙️</span>
+                    Settings
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        
+        <!-- OVERVIEW SECTION -->
+        <section id="overview-section" class="section active">
+            <div class="main-header">
+                <h1 class="main-title">📊 StudiFlow AI Dashboard</h1>
+                <p class="main-subtitle">Unified Enterprise & Marketing Control Center</p>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="stat-card">
+                    <div class="stat-value" id="posts-today">3</div>
+                    <div class="stat-label">📱 Posts heute</div>
+                    <div class="stat-change positive">↗ +2 seit gestern</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value" id="engagement-rate">4.2%</div>
+                    <div class="stat-label">❤️ Engagement Rate</div>
+                    <div class="stat-change positive">↗ +0.8% seit gestern</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value" id="new-followers">+47</div>
+                    <div class="stat-label">👥 Neue Follower</div>
+                    <div class="stat-change positive">↗ +12 seit gestern</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value" id="reach-today">2.8K</div>
+                    <div class="stat-label">📊 Reichweite</div>
+                    <div class="stat-change neutral">→ ±0% seit gestern</div>
+                </div>
+            </div>
+
+            <!-- System Status Cards -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🏥 System Health</h3>
+                    </div>
+                    <div class="card-body" id="system-health">
+                        <div class="loading-placeholder">Lade System Status...</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🤖 AI Services</h3>
+                    </div>
+                    <div class="card-body" id="ai-services">
+                        <div class="loading-placeholder">Lade AI Status...</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📱 Instagram Status</h3>
+                    </div>
+                    <div class="card-body" id="instagram-status">
+                        <div class="loading-placeholder">Lade Instagram Status...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Activity and Tasks -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🔄 Aktuelle Aktivitäten</h3>
+                        <div class="badge badge-success">🔴 LIVE</div>
+                    </div>
+                    <div class="card-body">
+                        <div id="live-activity" style="display: flex; flex-direction: column; gap: var(--space-3);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-3); background: var(--gray-50); border-radius: var(--radius-lg);">
+                                <span style="font-size: var(--font-size-sm); color: var(--gray-600);">vor 2 Min</span>
+                                <span>✅ Post "Lerntipps fürs Studium" veröffentlicht</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-3); background: var(--gray-50); border-radius: var(--radius-lg);">
+                                <span style="font-size: var(--font-size-sm); color: var(--gray-600);">vor 5 Min</span>
+                                <span>❤️ 12 neue Likes auf Recent Post</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-3); background: var(--gray-50); border-radius: var(--radius-lg);">
+                                <span style="font-size: var(--font-size-sm); color: var(--gray-600);">vor 8 Min</span>
+                                <span>👥 @uni_student_23 gefolgt</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📋 Wartende Aufgaben</h3>
+                        <div class="badge badge-warning">3</div>
+                    </div>
+                    <div class="card-body">
+                        <div id="pending-tasks" style="display: flex; flex-direction: column; gap: var(--space-3);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-3); background: var(--error-50); border-radius: var(--radius-lg); border-left: 4px solid var(--error-500);">
+                                <div style="display: flex; align-items: center; gap: var(--space-2);">
+                                    <span>🔥</span>
+                                    <span>Story Content Review benötigt</span>
+                                </div>
+                                <button class="btn btn-sm btn-primary">Review</button>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-3); background: var(--warning-50); border-radius: var(--radius-lg); border-left: 4px solid var(--warning-500);">
+                                <div style="display: flex; align-items: center; gap: var(--space-2);">
+                                    <span>⚠️</span>
+                                    <span>3 Posts für morgen planen</span>
+                                </div>
+                                <button class="btn btn-sm btn-primary">Planen</button>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-3); background: var(--info-50); border-radius: var(--radius-lg); border-left: 4px solid var(--info-500);">
+                                <div style="display: flex; align-items: center; gap: var(--space-2);">
+                                    <span>ℹ️</span>
+                                    <span>Wöchentlicher Report generieren</span>
+                                </div>
+                                <button class="btn btn-sm btn-primary">Report</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTENT PIPELINE SECTION -->
+        <section id="content-pipeline-section" class="section" style="display: none;">
+            <div class="main-header">
+                <h1 class="main-title">📝 Content Pipeline Management</h1>
+                <p class="main-subtitle">Verwalten Sie den gesamten Content-Workflow von der Erstellung bis zur Veröffentlichung</p>
+            </div>
+            
+            <!-- Pipeline Status -->
+            <div class="card mb-8">
+                <div class="card-header">
+                    <h3>🔄 Pipeline Übersicht</h3>
+                </div>
+                <div class="card-body">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); overflow-x: auto;">
+                        <div style="text-align: center; min-width: 120px;">
+                            <h4 style="margin-bottom: var(--space-2);">📰 Magazin Artikel</h4>
+                            <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--primary-600); margin-bottom: var(--space-1);">15</div>
+                            <div class="badge badge-primary">Verfügbar</div>
+                        </div>
+                        <div style="font-size: var(--font-size-xl); color: var(--gray-400);">→</div>
+                        <div style="text-align: center; min-width: 120px;">
+                            <h4 style="margin-bottom: var(--space-2);">🔄 In Bearbeitung</h4>
+                            <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--warning-600); margin-bottom: var(--space-1);">3</div>
+                            <div class="badge badge-warning">AI Processing</div>
+                        </div>
+                        <div style="font-size: var(--font-size-xl); color: var(--gray-400);">→</div>
+                        <div style="text-align: center; min-width: 120px;">
+                            <h4 style="margin-bottom: var(--space-2);">👀 Review</h4>
+                            <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--error-600); margin-bottom: var(--space-1);">2</div>
+                            <div class="badge badge-error">Warten</div>
+                        </div>
+                        <div style="font-size: var(--font-size-xl); color: var(--gray-400);">→</div>
+                        <div style="text-align: center; min-width: 120px;">
+                            <h4 style="margin-bottom: var(--space-2);">📅 Geplant</h4>
+                            <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--info-600); margin-bottom: var(--space-1);">5</div>
+                            <div class="badge badge-info">Ready</div>
+                        </div>
+                        <div style="font-size: var(--font-size-xl); color: var(--gray-400);">→</div>
+                        <div style="text-align: center; min-width: 120px;">
+                            <h4 style="margin-bottom: var(--space-2);">✅ Live</h4>
+                            <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--success-600); margin-bottom: var(--space-1);">12</div>
+                            <div class="badge badge-success">Published</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Review Queue -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>👀 Content Review Queue</h3>
+                    <div style="display: flex; gap: var(--space-3);">
+                        <button class="btn btn-primary" id="bulk-approve">✅ Alle genehmigen</button>
+                        <button class="btn btn-secondary" id="create-new-content">+ Neuer Content</button>
+                        <button class="btn btn-warning" id="test-button">🧪 Test Button</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="review-queue" style="display: flex; flex-direction: column; gap: var(--space-6);">
+                        <!-- Review Item 1 -->
+                        <div class="card" style="border-left: 4px solid var(--warning-500);">
+                            <div class="card-header">
+                                <div>
+                                    <div class="badge badge-primary">Instagram Post</div>
+                                    <h4 style="margin-top: var(--space-2);">Erfolgreich durchs Studium: 10 Tipps für bessere Noten</h4>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div style="background: var(--gray-50); padding: var(--space-4); border-radius: var(--radius-lg); margin-bottom: var(--space-4); font-family: var(--font-family-mono); font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">
+                                    💡 Wusstest du schon? Erfolgreich durchs Studium: 10 Tipps für bessere Noten<br><br>
+                                    Die besten Strategien für erfolgreiche Klausurvorbereitung...<br><br>
+                                    💬 Wie sind eure Erfahrungen?<br><br>
+                                    #studibuch #studium #lernen #uni #student #klausur #tipps
+                                </div>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-4);">
+                                    <div>
+                                        <span style="font-size: var(--font-size-sm); color: var(--gray-600);">Quelle:</span>
+                                        <div style="font-weight: var(--font-weight-medium);">StudiBuch Magazin</div>
+                                    </div>
+                                    <div>
+                                        <span style="font-size: var(--font-size-sm); color: var(--gray-600);">AI Confidence:</span>
+                                        <div style="font-weight: var(--font-weight-medium); color: var(--success-600);">94%</div>
+                                    </div>
+                                    <div>
+                                        <span style="font-size: var(--font-size-sm); color: var(--gray-600);">Geplant für:</span>
+                                        <div style="font-weight: var(--font-weight-medium);">Heute 16:30</div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
+                                    <button class="btn btn-success" id="approve-content">✅ Genehmigen</button>
+                                    <button class="btn btn-warning" id="request-changes">🔄 Änderungen anfordern</button>
+                                    <button class="btn btn-outline" id="edit-content">✏️ Bearbeiten</button>
+                                    <button class="btn btn-error" id="reject-content">❌ Ablehnen</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAGAZINE SECTION -->
+        <section id="magazine-section" class="section" style="display: none;">
+            <div class="main-header">
+                <h1 class="main-title">📰 StudiBuch Magazin Management</h1>
+                <p class="main-subtitle">Verwalten und transformieren Sie StudiBuch Magazin-Artikel für Social Media</p>
+                <div class="main-actions">
+                    <button class="btn btn-primary" id="scrape-magazine">🕷️ Magazin scrapen</button>
+                    <button class="btn btn-secondary" id="magazine-analytics">📊 Analytics</button>
+                </div>
+            </div>
+
+            <!-- Magazine Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="magazine-articles-count">--</div>
+                    <div class="stat-label">📰 Artikel verfügbar</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="magazine-modified-count">--</div>
+                    <div class="stat-label">🔄 Modifiziert</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="magazine-approved-count">--</div>
+                    <div class="stat-label">✅ Genehmigt</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="magazine-published-count">--</div>
+                    <div class="stat-label">🚀 Veröffentlicht</div>
+                </div>
+            </div>
+
+            <!-- Magazine Articles Browser -->
+            <div class="card card-wide">
+                <div class="card-header">
+                    <h3>📚 Magazin Artikel</h3>
+                    <div style="display: flex; gap: var(--space-3);">
+                        <select id="magazine-filter-category" class="form-select">
+                            <option value="all">Alle Kategorien</option>
+                            <option value="studium">Studium</option>
+                            <option value="karriere">Karriere</option>
+                            <option value="tipps">Tipps</option>
+                            <option value="motivation">Motivation</option>
+                        </select>
+                        <select id="magazine-filter-quality" class="form-select">
+                            <option value="all">Alle</option>
+                            <option value="high">Hohe Qualität</option>
+                            <option value="medium">Mittlere Qualität</option>
+                            <option value="low">Niedrige Qualität</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="magazine-articles-grid" id="magazine-articles-grid">
+                        <div class="loading-placeholder">Lade Magazin Artikel...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- POSTS SECTION -->
+        <section id="posts-section" class="section" style="display: none;">
+            <div class="main-header">
+                <h1 class="main-title">📱 Posts & Content Management</h1>
+                <p class="main-subtitle">Verwalten Sie alle Instagram Posts, Stories und Reels</p>
+                <div class="main-actions">
+                    <button class="btn btn-primary" id="create-post">+ Neuer Post</button>
+                    <button class="btn btn-secondary" id="schedule-posts">📅 Posts planen</button>
+                </div>
+            </div>
+
+            <!-- Post Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-posts">--</div>
+                    <div class="stat-label">📱 Total Posts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="scheduled-posts">--</div>
+                    <div class="stat-label">📅 Geplant</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="draft-posts">--</div>
+                    <div class="stat-label">📝 Entwürfe</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="published-today">--</div>
+                    <div class="stat-label">🚀 Heute veröffentlicht</div>
+                </div>
+            </div>
+
+            <!-- Posts Grid -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>📱 Aktuelle Posts</h3>
+                    <div style="display: flex; gap: var(--space-3);">
+                        <select class="form-select">
+                            <option>Alle Posts</option>
+                            <option>Veröffentlicht</option>
+                            <option>Geplant</option>
+                            <option>Entwürfe</option>
+                        </select>
+                        <select class="form-select">
+                            <option>Alle Formate</option>
+                            <option>Instagram Post</option>
+                            <option>Instagram Story</option>
+                            <option>Instagram Reel</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="posts-grid" class="magazine-articles-grid">
+                        <div class="loading-placeholder">Lade Posts...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ENGAGEMENT SECTION -->
+        <section id="engagement-section" class="section" style="display: none;">
+            <div class="main-header">
+                <h1 class="main-title">💬 Live Engagement Management</h1>
+                <p class="main-subtitle">Steuern Sie die automatische Instagram-Interaktion in Echtzeit</p>
+            </div>
+            
+            <!-- Engagement Controls -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🎯 Engagement Automation</h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: flex; gap: var(--space-3); margin-bottom: var(--space-4);">
+                            <button class="btn btn-success" id="start-engagement">▶️ Start Engagement</button>
+                            <button class="btn btn-warning" id="pause-engagement">⏸️ Pausieren</button>
+                            <button class="btn btn-error" id="stop-engagement">⏹️ Stoppen</button>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: var(--space-4);">
+                            <div class="badge badge-success">🟢 Aktiv</div>
+                            <span style="color: var(--gray-600);">47 Interaktionen heute</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📊 Live Metriken</h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--space-4);">
+                            <div style="text-align: center;">
+                                <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--primary-600);">12</div>
+                                <div style="font-size: var(--font-size-sm); color: var(--gray-600);">Likes/Stunde</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--success-600);">3</div>
+                                <div style="font-size: var(--font-size-sm); color: var(--gray-600);">Follows/Stunde</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--info-600);">2</div>
+                                <div style="font-size: var(--font-size-sm); color: var(--gray-600);">Comments/Stunde</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Engagement Activity -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>🔄 Letzte Aktivitäten</h3>
+                </div>
+                <div class="card-body">
+                    <div id="engagement-activity" style="display: flex; flex-direction: column; gap: var(--space-3);">
+                        <div style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--gray-50); border-radius: var(--radius-lg);">
+                            <span style="font-size: var(--font-size-lg);">❤️</span>
+                            <span style="flex: 1;">Liked @student_life_hacks Post</span>
+                            <span style="font-size: var(--font-size-sm); color: var(--gray-600);">vor 2 Min</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--gray-50); border-radius: var(--radius-lg);">
+                            <span style="font-size: var(--font-size-lg);">👥</span>
+                            <span style="flex: 1;">Followed @uni_tipps_daily</span>
+                            <span style="font-size: var(--font-size-sm); color: var(--gray-600);">vor 5 Min</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--gray-50); border-radius: var(--radius-lg);">
+                            <span style="font-size: var(--font-size-lg);">💬</span>
+                            <span style="flex: 1;">Commented on @studium_motivation</span>
+                            <span style="font-size: var(--font-size-sm); color: var(--gray-600);">vor 8 Min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ANALYTICS SECTION -->
+        <section id="analytics-section" class="section" style="display: none;">
+            <div class="main-header">
+                <h1 class="main-title">📈 Analytics & Performance</h1>
+                <p class="main-subtitle">Detaillierte Einblicke in die Performance Ihrer Instagram-Aktivitäten</p>
+                <div class="main-actions">
+                    <select id="analytics-period" class="form-select">
+                        <option value="7d">Letzte 7 Tage</option>
+                        <option value="30d">Letzte 30 Tage</option>
+                        <option value="90d">Letzte 90 Tage</option>
+                    </select>
+                    <button class="btn btn-primary" id="export-analytics">📊 Export</button>
+                </div>
+            </div>
+            
+            <!-- Performance Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📊 Heute</h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: var(--space-4); text-align: center;">
+                            <div>
+                                <div style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); color: var(--primary-600);">2.8K</div>
+                                <div style="font-size: var(--font-size-sm); color: var(--gray-600);">Reichweite</div>
+                            </div>
+                            <div>
+                                <div style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); color: var(--success-600);">4.2%</div>
+                                <div style="font-size: var(--font-size-sm); color: var(--gray-600);">Engagement</div>
+                            </div>
+                            <div>
+                                <div style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); color: var(--info-600);">+47</div>
+                                <div style="font-size: var(--font-size-sm); color: var(--gray-600);">Follower</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📅 Diese Woche</h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: var(--space-4); text-align: center;">
+                            <div>
+                                <div style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); color: var(--primary-600);">18.5K</div>
+                                <div style="font-size: var(--font-size-sm); color: var(--gray-600);">Reichweite</div>
+                            </div>
+                            <div>
+                                <div style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); color: var(--success-600);">3.8%</div>
+                                <div style="font-size: var(--font-size-sm); color: var(--gray-600);">Engagement</div>
+                            </div>
+                            <div>
+                                <div style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); color: var(--info-600);">+234</div>
+                                <div style="font-size: var(--font-size-sm); color: var(--gray-600);">Follower</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📆 Diesen Monat</h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: var(--space-4); text-align: center;">
+                            <div>
+                                <div style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); color: var(--primary-600);">89.2K</div>
+                                <div style="font-size: var(--font-size-sm); color: var(--gray-600);">Reichweite</div>
+                            </div>
+                            <div>
+                                <div style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); color: var(--success-600);">4.1%</div>
+                                <div style="font-size: var(--font-size-sm); color: var(--gray-600);">Engagement</div>
+                            </div>
+                            <div>
+                                <div style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); color: var(--info-600);">+1.2K</div>
+                                <div style="font-size: var(--font-size-sm); color: var(--gray-600);">Follower</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📈 Reichweite Entwicklung</h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="height: 200px; display: flex; align-items: center; justify-content: center; background: var(--gray-50); border-radius: var(--radius-lg); text-align: center;">
+                            <div>
+                                <div style="font-size: var(--font-size-2xl); margin-bottom: var(--space-2);">📊</div>
+                                <p style="margin: 0; color: var(--gray-600);">Chart wird geladen...</p>
+                                <p style="font-size: var(--font-size-sm); color: var(--gray-500); margin: var(--space-1) 0 0 0;">Reichweite der letzten 30 Tage</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>💬 Engagement Trends</h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="height: 200px; display: flex; align-items: center; justify-content: center; background: var(--gray-50); border-radius: var(--radius-lg); text-align: center;">
+                            <div>
+                                <div style="font-size: var(--font-size-2xl); margin-bottom: var(--space-2);">📊</div>
+                                <p style="margin: 0; color: var(--gray-600);">Chart wird geladen...</p>
+                                <p style="font-size: var(--font-size-sm); color: var(--gray-500); margin: var(--space-1) 0 0 0;">Engagement Rate Entwicklung</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ALERTS SECTION -->
+        <section id="alerts-section" class="section" style="display: none;">
+            <div class="main-header">
+                <h1 class="main-title">🚨 Alerts & Monitoring</h1>
+                <p class="main-subtitle">Überwachen Sie kritische Systemereignisse und Benachrichtigungen</p>
+            </div>
+            
+            <!-- Alert Summary -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="stat-card" style="border-left: 4px solid var(--error-500);">
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">🚨 Kritisch</div>
+                </div>
+                <div class="stat-card" style="border-left: 4px solid var(--warning-500);">
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">⚠️ Warnungen</div>
+                </div>
+                <div class="stat-card" style="border-left: 4px solid var(--info-500);">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">ℹ️ Info</div>
+                </div>
+                <div class="stat-card" style="border-left: 4px solid var(--success-500);">
+                    <div class="stat-value">34</div>
+                    <div class="stat-label">✅ Gelöst</div>
+                </div>
+            </div>
+
+            <!-- Active Alerts -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>🔴 Aktive Alerts</h3>
+                </div>
+                <div class="card-body">
+                    <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+                        <div class="alert alert-error">
+                            <div style="display: flex; align-items: flex-start; gap: var(--space-4);">
+                                <div style="font-size: var(--font-size-xl);">🚨</div>
+                                <div style="flex: 1;">
+                                    <h4 style="margin-bottom: var(--space-2);">Instagram API Rate Limit erreicht</h4>
+                                    <p style="margin-bottom: var(--space-2);">Die Instagram API Rate Limits wurden überschritten. Automatische Posts pausiert.</p>
+                                    <span style="font-size: var(--font-size-sm); color: var(--gray-600);">vor 15 Min</span>
+                                </div>
+                                <div style="display: flex; gap: var(--space-2);">
+                                    <button class="btn btn-sm btn-outline">Details</button>
+                                    <button class="btn btn-sm btn-primary">Lösen</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <div style="display: flex; align-items: flex-start; gap: var(--space-4);">
+                                <div style="font-size: var(--font-size-xl);">⚠️</div>
+                                <div style="flex: 1;">
+                                    <h4 style="margin-bottom: var(--space-2);">Niedrige Content Pipeline</h4>
+                                    <p style="margin-bottom: var(--space-2);">Nur noch 2 Posts in der Review Queue. Neue Inhalte benötigt.</p>
+                                    <span style="font-size: var(--font-size-sm); color: var(--gray-600);">vor 1 Std</span>
+                                </div>
+                                <div style="display: flex; gap: var(--space-2);">
+                                    <button class="btn btn-sm btn-outline">Details</button>
+                                    <button class="btn btn-sm btn-primary">Lösen</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SETTINGS SECTION -->
+        <section id="settings-section" class="section" style="display: none;">
+            <div class="main-header">
+                <h1 class="main-title">⚙️ System Settings</h1>
+                <p class="main-subtitle">Konfigurieren Sie alle Aspekte des StudiFlow AI Systems</p>
+            </div>
+
+            <!-- Settings Cards -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🤖 AI Configuration</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">OpenAI API Key:</label>
+                            <input type="password" class="form-input" placeholder="sk-...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Gemini API Key:</label>
+                            <input type="password" class="form-input" placeholder="AIza...">
+                        </div>
+                        <button class="btn btn-primary">Speichern</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📱 Instagram Settings</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Username:</label>
+                            <input type="text" class="form-input" placeholder="@studibuch">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Access Token:</label>
+                            <input type="password" class="form-input" placeholder="IGQVJ...">
+                        </div>
+                        <button class="btn btn-primary">Speichern</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Floating Action Button (FAB) -->
+    <div class="fab">
+        <button class="fab-button" id="fab-main">
+            <span>⚡</span>
+        </button>
+        <div class="fab-menu" id="fab-menu">
+            <a href="#" class="fab-option" id="emergency-pause">
+                <span>⏸️</span>
+                <span>Notfall Pause</span>
+            </a>
+            <a href="#" class="fab-option" id="contact-support">
+                <span>💬</span>
+                <span>Support kontaktieren</span>
+            </a>
+            <a href="#" class="fab-option" id="system-status">
+                <span>📊</span>
+                <span>System Status</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script>
+        // Unified dashboard navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Section navigation
+            const navItems = document.querySelectorAll('.sidebar-nav-item');
+            const sections = document.querySelectorAll('.section');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all nav items and sections
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        section.style.display = 'none';
+                    });
+                    
+                    // Add active class to clicked nav item
+                    this.classList.add('active');
+                    
+                    // Show corresponding section
+                    const sectionId = this.getAttribute('data-section') + '-section';
+                    const targetSection = document.getElementById(sectionId);
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                        targetSection.style.display = 'block';
+                    }
+                });
+            });
+            
+            // FAB menu functionality
+            const fabMain = document.getElementById('fab-main');
+            const fabMenu = document.getElementById('fab-menu');
+            
+            if (fabMain && fabMenu) {
+                fabMain.addEventListener('click', function() {
+                    fabMenu.classList.toggle('open');
+                });
+                
+                // Close FAB menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!fabMain.contains(e.target) && !fabMenu.contains(e.target)) {
+                        fabMenu.classList.remove('open');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
