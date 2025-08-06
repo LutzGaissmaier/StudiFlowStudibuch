@@ -6,7 +6,7 @@
  * @version 1.0.0
  */
 
-import { colors, typography, spacing } from './components';
+import { colors, typography, spacing, borderRadius, shadows, breakpoints } from './theme';
 
 // Dashboard-Seite
 export const dashboardTemplate = `

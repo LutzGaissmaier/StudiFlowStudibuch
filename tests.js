@@ -17,8 +17,8 @@ const path = require('path');
 const config = {
   baseUrl: 'http://localhost:3000',
   apiBaseUrl: 'http://localhost:3000/api',
-  username: 'admin',
-  password: 'password',
+  username: process.env.TEST_USERNAME || 'admin',
+  password: process.env.TEST_PASSWORD || 'password',
   timeout: 10000, // 10 Sekunden
   screenshotDir: path.join(__dirname, 'test-screenshots')
 };

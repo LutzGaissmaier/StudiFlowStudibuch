@@ -169,7 +169,7 @@ export class StudiBuchMagazineService {
   /**
    * Extract article links from main page
    */
-  private extractArticleLinks($: cheerio.CheerioAPI): string[] {
+  private extractArticleLinks($: any): string[] {
     const links: string[] = [];
     
     // Different selectors for StudiBuch magazine structure
@@ -183,7 +183,7 @@ export class StudiBuchMagazineService {
     ];
 
     selectors.forEach(selector => {
-      $(selector).each((_, element) => {
+      $(selector).each((_: any, element: any) => {
         const href = $(element).attr('href');
         if (href) {
           const fullUrl = href.startsWith('http') ? href : `${this.baseUrl}${href}`;
@@ -270,7 +270,7 @@ export class StudiBuchMagazineService {
   /**
    * Extract title from article page
    */
-  private extractTitle($: cheerio.CheerioAPI): string {
+  private extractTitle($: any): string {
     const selectors = [
       'h1.entry-title',
       'h1.post-title',
@@ -293,7 +293,7 @@ export class StudiBuchMagazineService {
   /**
    * Extract content from article page
    */
-  private extractContent($: cheerio.CheerioAPI): { html: string; text: string } {
+  private extractContent($: any): { html: string; text: string } {
     const selectors = [
       '.entry-content',
       '.post-content',
@@ -444,26 +444,26 @@ export class StudiBuchMagazineService {
     return `${articleId}_${format}_${Date.now()}`;
   }
 
-  private extractAuthor($: cheerio.CheerioAPI): string {
+  private extractAuthor($: any): string {
     return $('.author').first().text().trim() || 'StudiBuch Team';
   }
 
-  private extractPublishedDate($: cheerio.CheerioAPI): Date {
+  private extractPublishedDate($: any): Date {
     const dateStr = $('.published, .date, time').first().attr('datetime') || $('.published, .date, time').first().text();
     return dateStr ? new Date(dateStr) : new Date();
   }
 
-  private extractCategory($: cheerio.CheerioAPI): string {
+  private extractCategory($: any): string {
     return $('.category, .tag').first().text().trim() || 'Studium';
   }
 
-  private extractSubtitle($: cheerio.CheerioAPI): string | undefined {
+  private extractSubtitle($: any): string | undefined {
     return $('.subtitle, .excerpt').first().text().trim() || undefined;
   }
 
-  private extractImages($: cheerio.CheerioAPI, baseUrl: string): MagazineArticle['images'] {
+  private extractImages($: any, baseUrl: string): MagazineArticle['images'] {
     const images: string[] = [];
-    $('img').each((_, img) => {
+    $('img').each((_: any, img: any) => {
       const src = $(img).attr('src');
       if (src) {
         images.push(src.startsWith('http') ? src : new URL(src, baseUrl).href);
@@ -477,9 +477,9 @@ export class StudiBuchMagazineService {
     };
   }
 
-  private extractTags($: cheerio.CheerioAPI): string[] {
+  private extractTags($: any): string[] {
     const tags: string[] = [];
-    $('.tag, .category, .keyword').each((_, element) => {
+    $('.tag, .category, .keyword').each((_: any, element: any) => {
       const tag = $(element).text().trim();
       if (tag && !tags.includes(tag)) {
         tags.push(tag);
@@ -869,4 +869,4 @@ export class StudiBuchMagazineService {
 
     mainLogger.info(`📝 Created ${mockArticles.length} mock articles and ${mockModifiedContent.length} mock modified content items`);
   }
-} 
+}          

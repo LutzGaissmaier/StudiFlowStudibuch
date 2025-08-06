@@ -125,7 +125,7 @@ export class MagazineScraper {
   /**
    * Extrahiert Artikel-Links von der Hauptseite
    */
-  private extractArticleLinks($: cheerio.CheerioAPI): ArticleLink[] {
+  private extractArticleLinks($: any): ArticleLink[] {
     const links: ArticleLink[] = [];
     
     // Verschiedene Selektoren für die StudiBuch Magazin-Struktur
@@ -139,7 +139,7 @@ export class MagazineScraper {
     ];
 
     selectors.forEach(selector => {
-      $(selector).each((_, element) => {
+      $(selector).each((_: any, element: any) => {
         const href = $(element).attr('href');
         const title = $(element).text().trim();
         
