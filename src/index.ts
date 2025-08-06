@@ -141,8 +141,21 @@ class StudiFlowAIEnterpriseApp {
    * Setup Express middleware
    */
   private setupMiddleware(): void {
-    // Security middleware
-    this.app.use(helmet());
+    // Security middleware with custom CSP
+    this.app.use(helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", "data:", "https:", "http:"],
+          connectSrc: ["'self'", "ws:", "wss:"],
+          fontSrc: ["'self'", "data:"],
+          objectSrc: ["'none'"],
+          baseUri: ["'self'"]
+        }
+      }
+    }));
 
     // CORS - Allow all localhost ports for development
     this.app.use(cors({
@@ -289,7 +302,6 @@ class StudiFlowAIEnterpriseApp {
     this.app.use('/api', createAPIRoutes(this.magazineService, this.schedulerService));
 
     console.log('✅ API routes configured');
-    return;
   }
 
   /**
@@ -597,4 +609,4 @@ if (require.main === module) {
   });
 }
 
-export default StudiFlowAIEnterpriseApp;                      
+export default StudiFlowAIEnterpriseApp;                          

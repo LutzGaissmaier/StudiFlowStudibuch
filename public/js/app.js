@@ -895,7 +895,7 @@ class ExtendedUIManager extends UIManager {
     // Get ALL buttons on the page
     const allButtons = document.querySelectorAll('button, .btn, input[type="button"], input[type="submit"]');
     
-    allButtons.forEach((button, index) => {
+    allButtons.forEach((button) => {
       // Skip if already has universal handler
       if (button.hasAttribute('data-universal-attached')) {
         return;
@@ -1950,7 +1950,7 @@ class ExtendedUIManager extends UIManager {
     if (!bestTimes) return;
 
     const days = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
-    const html = days.map((day, index) => {
+    const html = days.map((day) => {
       const performance = Math.random();
       const className = performance > 0.7 ? 'best' : performance > 0.4 ? 'good' : '';
       return `<div class="time-cell ${className}">${day}<br>18:00</div>`;
@@ -3772,7 +3772,6 @@ class ExtendedUIManager extends UIManager {
   updateInstagramPreview() {
     console.log('👁️ Updating Instagram preview...');
     
-    const format = document.getElementById('target-format')?.value || 'post';
     const tone = document.getElementById('content-tone')?.value || 'educational';
     const audience = document.getElementById('target-audience')?.value || 'students';
     const maxLength = parseInt(document.getElementById('max-length')?.value) || 2000;
@@ -3952,7 +3951,6 @@ class ExtendedUIManager extends UIManager {
 }
 
 // Replace the original UIManager with extended version
-const originalUIManager = UIManager;
 window.UIManager = ExtendedUIManager;
 
 // Update the main app initialization
@@ -3974,4 +3972,4 @@ if (typeof app !== 'undefined') {
 }
 
 // Make UI manager globally available for button clicks
-window.ui = app?.ui || new ExtendedUIManager();                                                            
+window.ui = app?.ui || new ExtendedUIManager();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
