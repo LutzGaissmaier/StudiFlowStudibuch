@@ -89,7 +89,6 @@ class StudiFlowAIEnterpriseApp {
   private instagramService!: SimplifiedInstagramService;
   private aiService!: AIAgentService;
   private automationService = new InstagramAutomationDemoService();
-  private contentService = new MockService('📝 Content Service');
   
   // Real services
   private magazineService = new StudiBuchMagazineService();
@@ -238,7 +237,6 @@ class StudiFlowAIEnterpriseApp {
       );
       await this.instagramService.initialize();
       
-      await this.contentService.initialize();
       await this.schedulerService.initialize();
       
       // Initialize StudiBuch Magazine Service
@@ -488,7 +486,6 @@ class StudiFlowAIEnterpriseApp {
 
         // Shutdown services
         await this.schedulerService.shutdown();
-        await this.contentService.shutdown();
         if (this.instagramService) {
           await this.instagramService.shutdown();
         }
@@ -607,4 +604,4 @@ if (require.main === module) {
   });
 }
 
-export default StudiFlowAIEnterpriseApp;                                
+export default StudiFlowAIEnterpriseApp;                                  
