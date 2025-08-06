@@ -6,7 +6,7 @@
  * @version 1.0.0
  */
 
-import { colors, typography, spacing, shadows, borderRadius } from './components';
+import { colors, typography, spacing, shadows, borderRadius, transitions, breakpoints } from './theme';
 
 // Hauptnavigationsstruktur
 export const mainNavigation = [

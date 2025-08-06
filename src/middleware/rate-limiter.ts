@@ -8,7 +8,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import redis from '../core/redis';
+import { redis } from '../core/redis';
 import logger from '../core/logger';
 
 // Konfiguration
@@ -55,7 +55,7 @@ export const rateLimiter = (options: RateLimiterOptions = {}) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       // Überprüfen, ob der Benutzer authentifiziert ist und ob wir überspringen sollen
-      if (options.skipIfAuthenticated && req.user) {
+      if (options.skipIfAuthenticated && (req as any).user) {
         return next();
       }
       
@@ -93,7 +93,7 @@ export const rateLimiter = (options: RateLimiterOptions = {}) => {
       next();
     } catch (error) {
       // Bei Fehlern fortfahren, um die API nicht zu blockieren
-      logger.error(`Rate limiter error: ${error.message}`);
+      logger.error(`Rate limiter error: ${(error as Error).message}`);
       next();
     }
   };

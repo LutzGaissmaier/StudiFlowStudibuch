@@ -154,7 +154,9 @@ export class RedisManager {
   /**
    * Set a key-value pair with optional TTL
    */
-  async set(key: string, value: string | object, ttlSeconds?: number): Promise<void> {
+  async set(key: string, value: string | object, ttlSeconds?: number): Promise<void>;
+  async set(key: string, value: string, mode: string, ttlMs: number): Promise<void>;
+  async set(key: string, value: string | object, ttlSecondsOrMode?: number | string, ttlMs?: number): Promise<void> {
     if (!this.client) {
       throw new Error('Redis client not initialized');
     }
@@ -162,8 +164,10 @@ export class RedisManager {
     try {
       const serializedValue = typeof value === 'object' ? JSON.stringify(value) : value;
       
-      if (ttlSeconds) {
-        await this.client.setex(key, ttlSeconds, serializedValue);
+      if (typeof ttlSecondsOrMode === 'string' && ttlSecondsOrMode === 'PX' && ttlMs) {
+        await this.client.set(key, serializedValue, 'PX', ttlMs);
+      } else if (typeof ttlSecondsOrMode === 'number') {
+        await this.client.setex(key, ttlSecondsOrMode, serializedValue);
       } else {
         await this.client.set(key, serializedValue);
       }
@@ -256,6 +260,39 @@ export class RedisManager {
   }
 
   /**
+   * Set TTL for a key in milliseconds
+   */
+  async pexpire(key: string, milliseconds: number): Promise<boolean> {
+    if (!this.client) {
+      throw new Error('Redis client not initialized');
+    }
+
+    try {
+      const result = await this.client.pexpire(key, milliseconds);
+      return result === 1;
+    } catch (error) {
+      mainLogger.error(`❌ Redis PEXPIRE operation failed for key: ${key}`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Increment a key's value
+   */
+  async incr(key: string): Promise<number> {
+    if (!this.client) {
+      throw new Error('Redis client not initialized');
+    }
+
+    try {
+      return await this.client.incr(key);
+    } catch (error) {
+      mainLogger.error(`❌ Redis INCR operation failed for key: ${key}`, error);
+      throw error;
+    }
+  }
+
+  /**
    * Get all keys matching pattern
    */
   async keys(pattern: string): Promise<string[]> {
@@ -343,3 +380,5 @@ export class RedisManager {
     return this.client;
   }
 } 
+
+export const redis = new RedisManager();   

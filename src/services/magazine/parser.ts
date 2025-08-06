@@ -171,7 +171,7 @@ export class MagazineParser {
   /**
    * Extrahiert den Titel aus der Artikel-Seite
    */
-  private extractTitle($: cheerio.CheerioAPI): string {
+  private extractTitle($: any): string {
     const selectors = [
       'h1.entry-title',
       'h1.post-title',
@@ -194,7 +194,7 @@ export class MagazineParser {
   /**
    * Extrahiert den Untertitel aus der Artikel-Seite
    */
-  private extractSubtitle($: cheerio.CheerioAPI): string | undefined {
+  private extractSubtitle($: any): string | undefined {
     const selectors = [
       '.subtitle',
       '.excerpt',
@@ -216,7 +216,7 @@ export class MagazineParser {
   /**
    * Extrahiert den Autor aus der Artikel-Seite
    */
-  private extractAuthor($: cheerio.CheerioAPI): string {
+  private extractAuthor($: any): string {
     const selectors = [
       '.author',
       '.byline',
@@ -241,7 +241,7 @@ export class MagazineParser {
   /**
    * Extrahiert das Veröffentlichungsdatum aus der Artikel-Seite
    */
-  private extractPublishedDate($: cheerio.CheerioAPI): Date {
+  private extractPublishedDate($: any): Date {
     const selectors = [
       '.published',
       '.date',
@@ -281,7 +281,7 @@ export class MagazineParser {
   /**
    * Extrahiert die Kategorie aus der Artikel-Seite
    */
-  private extractCategory($: cheerio.CheerioAPI): string {
+  private extractCategory($: any): string {
     const selectors = [
       '.category',
       '.tag',
@@ -306,7 +306,7 @@ export class MagazineParser {
   /**
    * Extrahiert den Inhalt aus der Artikel-Seite
    */
-  private extractContent($: cheerio.CheerioAPI): { html: string; text: string } {
+  private extractContent($: any): { html: string; text: string } {
     const selectors = [
       '.entry-content',
       '.post-content',
@@ -331,11 +331,11 @@ export class MagazineParser {
   /**
    * Extrahiert Bilder aus der Artikel-Seite
    */
-  private extractImages($: cheerio.CheerioAPI, baseUrl: string): MagazineArticle['images'] {
+  private extractImages($: any, baseUrl: string): MagazineArticle['images'] {
     const images: string[] = [];
     const alt: string[] = [];
     
-    $('img').each((_, img) => {
+    $('img').each((_: any, img: any) => {
       const src = $(img).attr('src');
       const altText = $(img).attr('alt') || '';
       
@@ -356,10 +356,10 @@ export class MagazineParser {
   /**
    * Extrahiert Tags aus der Artikel-Seite
    */
-  private extractTags($: cheerio.CheerioAPI): string[] {
+  private extractTags($: any): string[] {
     const tags: string[] = [];
     
-    $('.tag, .category, .keyword, .tags a, .categories a').each((_, element) => {
+    $('.tag, .category, .keyword, .tags a, .categories a').each((_: any, element: any) => {
       const tag = $(element).text().trim();
       if (tag && !tags.includes(tag)) {
         tags.push(tag);

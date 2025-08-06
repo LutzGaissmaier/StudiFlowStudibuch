@@ -88,7 +88,7 @@ export class SchedulerService {
     mainLogger.info('⏰ Scheduler service shutting down...');
     
     // Stop all cron jobs
-    this.cronJobs.forEach(job => job.destroy());
+    this.cronJobs.forEach(job => job.stop());
     this.cronJobs.clear();
     
     this.isInitialized = false;
@@ -442,4 +442,4 @@ export class SchedulerService {
 
     return posts;
   }
-} 
+}  
