@@ -279,13 +279,13 @@ class StudiFlowAIEnterpriseApp {
         const health = await this.healthMonitor.getSystemHealth();
         const statusCode = health.status === 'healthy' ? 200 : 503;
         
-        res.status(statusCode).json({
+        return res.status(statusCode).json({
           success: health.status === 'healthy',
           data: health
         });
       } catch (error) {
         console.error('Health check failed', error);
-        res.status(503).json({
+        return res.status(503).json({
           success: false,
           error: {
             code: 'HEALTH_CHECK_FAILED',
@@ -604,4 +604,4 @@ if (require.main === module) {
   });
 }
 
-export default StudiFlowAIEnterpriseApp;                                  
+export default StudiFlowAIEnterpriseApp;                                      
