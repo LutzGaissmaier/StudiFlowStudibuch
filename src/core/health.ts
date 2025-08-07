@@ -8,8 +8,15 @@
  * @version 1.0.0
  */
 
-import { SystemHealth } from '../types/core';
-import { mainLogger } from './logger';
+import { DatabaseManager } from './database';
+import { RedisManager } from './redis';
+
+interface SystemHealth {
+  status: 'healthy' | 'degraded' | 'unhealthy';
+  services: any;
+  metrics: any;
+  lastCheck: Date;
+}
 
 /**
  * Health Monitor Class
@@ -17,10 +24,15 @@ import { mainLogger } from './logger';
  * Monitors system health and provides health check endpoints
  */
 export class HealthMonitor {
-  private startTime: number = Date.now();
+  private databaseManager: DatabaseManager;
+  private redisManager: RedisManager;
+  private startTime: number;
+  private healthCheckInterval: NodeJS.Timeout | null = null;
 
-  constructor() {
-    // Initialize health monitor
+  constructor(databaseManager: DatabaseManager, redisManager: RedisManager) {
+    this.databaseManager = databaseManager;
+    this.redisManager = redisManager;
+    this.startTime = Date.now();
   }
 
   /**
@@ -28,7 +40,7 @@ export class HealthMonitor {
    */
   async initialize(): Promise<void> {
     this.startTime = Date.now();
-    mainLogger.info('🏥 Health monitor initialized');
+    console.log('🏥 Health monitor initialized');
   }
 
   /**
@@ -212,4 +224,12 @@ export class HealthMonitor {
     const health = await this.getSystemHealth();
     return health.status === 'healthy';
   }
-} 
+
+  async shutdown(): Promise<void> {
+    if (this.healthCheckInterval) {
+      clearInterval(this.healthCheckInterval);
+      this.healthCheckInterval = null;
+    }
+    console.log('🏥 Health Monitor shutdown');
+  }
+}          

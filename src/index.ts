@@ -17,10 +17,17 @@ import rateLimit from 'express-rate-limit';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 
-// Import services
+// Import core services
+import { DatabaseManager } from './core/database';
+import { RedisManager } from './core/redis';
+import { HealthMonitor } from './core/health';
+
+// Import business services
 import { StudiBuchMagazineService } from './services/studibuch-magazine';
 import { SchedulerService } from './services/scheduler';
-import { RealAutomationService } from './services/real-automation-service';
+import { InstagramAutomationDemoService } from './services/instagram-automation-demo';
+import { SimplifiedInstagramService } from './services/instagram/simplified';
+import { AIAgentService } from './services/ai/agent';
 import { createAPIRoutes } from './api/index';
 
 // Mock services for development
@@ -75,19 +82,18 @@ class StudiFlowAIEnterpriseApp {
   private io: SocketIOServer;
   private isShuttingDown = false;
 
-  // Mock services
-  private databaseManager = new MockDatabaseManager();
-  private redisManager = new MockRedisManager();
-  private healthMonitor = new MockHealthMonitor();
-  private instagramService = new MockService('📱 Instagram Service');
-  private aiService = new MockService('🤖 AI Service');
-  private scrapingService = new MockService('🕷️ Scraping Service');
-  private contentService = new MockService('📝 Content Service');
+  // Real services
+  private databaseManager = new DatabaseManager();
+  private redisManager = new RedisManager();
+  private healthMonitor!: HealthMonitor;
+  private instagramService!: SimplifiedInstagramService;
+  private aiService!: AIAgentService;
+  private automationService = new InstagramAutomationDemoService();
   
   // Real services
   private magazineService = new StudiBuchMagazineService();
   private schedulerService = new SchedulerService();
-  private realAutomationService = new RealAutomationService();
+  
 
   constructor() {
     this.app = express();
@@ -133,8 +139,22 @@ class StudiFlowAIEnterpriseApp {
    * Setup Express middleware
    */
   private setupMiddleware(): void {
-    // Security middleware
-    this.app.use(helmet());
+    // Security middleware with custom CSP
+    this.app.use(helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+          scriptSrcAttr: ["'unsafe-inline'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", "data:", "https:", "http:"],
+          connectSrc: ["'self'", "ws:", "wss:"],
+          fontSrc: ["'self'", "data:"],
+          objectSrc: ["'none'"],
+          baseUri: ["'self'"]
+        }
+      }
+    }));
 
     // CORS - Allow all localhost ports for development
     this.app.use(cors({
@@ -185,23 +205,52 @@ class StudiFlowAIEnterpriseApp {
    */
   private async initializeServices(): Promise<void> {
     try {
-      await this.databaseManager.connect();
-      await this.redisManager.connect();
+      try {
+        await this.databaseManager.connect();
+        console.log('✅ Database connected successfully');
+      } catch (error) {
+        console.warn('⚠️ Database connection failed - running without database:', (error as Error).message);
+      }
+      
+      try {
+        await this.redisManager.connect();
+        console.log('✅ Redis connected successfully');
+      } catch (error) {
+        console.warn('⚠️ Redis connection failed - running without Redis:', (error as Error).message);
+      }
+      
+      // Initialize health monitor with real services
+      this.healthMonitor = new HealthMonitor(this.databaseManager, this.redisManager);
       await this.healthMonitor.initialize();
+      
+      // Initialize AI Agent Service
+      const geminiApiKeys = this.getGeminiApiKeys();
+      this.aiService = new AIAgentService(geminiApiKeys);
       await this.aiService.initialize();
+      
+      // Initialize Instagram Service with automation
+      const automationCredentials = this.getInstagramAutomationCredentials();
+      this.instagramService = new SimplifiedInstagramService(
+        this.getInstagramCredentials(), 
+        automationCredentials, 
+        geminiApiKeys
+      );
       await this.instagramService.initialize();
-      await this.scrapingService.initialize();
-      await this.contentService.initialize();
+      
       await this.schedulerService.initialize();
       
       // Initialize StudiBuch Magazine Service
       await this.magazineService.initialize();
       
-      // Initialize Real Automation Service
-      await this.realAutomationService.initialize();
+      // Initialize Automation Service
+      await this.automationService.initialize();
       
-      // Make real automation service globally available for API routes
-      (global as any).realAutomationService = this.realAutomationService;
+      // Make services globally available for API routes
+      (global as any).automationService = this.automationService;
+      (global as any).aiService = this.aiService;
+      (global as any).instagramService = this.instagramService;
+      (global as any).healthMonitor = this.healthMonitor;
+      (global as any).io = this.io;
       
       console.log('✅ All services initialized');
     } catch (error) {
@@ -217,16 +266,26 @@ class StudiFlowAIEnterpriseApp {
     // Health check endpoint
     this.app.get('/health', async (req, res) => {
       try {
+        if (!this.healthMonitor) {
+          return res.status(503).json({
+            success: false,
+            error: {
+              code: 'HEALTH_MONITOR_UNAVAILABLE',
+              message: 'Health monitor not initialized'
+            }
+          });
+        }
+        
         const health = await this.healthMonitor.getSystemHealth();
         const statusCode = health.status === 'healthy' ? 200 : 503;
         
-        res.status(statusCode).json({
-          success: true,
+        return res.status(statusCode).json({
+          success: health.status === 'healthy',
           data: health
         });
       } catch (error) {
         console.error('Health check failed', error);
-        res.status(503).json({
+        return res.status(503).json({
           success: false,
           error: {
             code: 'HEALTH_CHECK_FAILED',
@@ -427,12 +486,22 @@ class StudiFlowAIEnterpriseApp {
 
         // Shutdown services
         await this.schedulerService.shutdown();
-        await this.contentService.shutdown();
-        await this.scrapingService.shutdown();
-        await this.instagramService.shutdown();
-        await this.aiService.shutdown();
+        if (this.instagramService) {
+          await this.instagramService.shutdown();
+        }
+        if (this.aiService) {
+          await this.aiService.shutdown();
+        }
+        await this.automationService.emergencyStop('System shutdown');
+        if (this.healthMonitor) {
+          await this.healthMonitor.shutdown();
+        }
         await this.redisManager.disconnect();
         await this.databaseManager.disconnect();
+        
+        if (this.io) {
+          this.io.close();
+        }
 
         console.log('✅ Graceful shutdown completed');
         process.exit(0);
@@ -446,6 +515,45 @@ class StudiFlowAIEnterpriseApp {
     process.on('SIGINT', () => shutdown('SIGINT'));
 
     console.log('✅ Graceful shutdown handlers configured');
+  }
+
+  /**
+   * Get Gemini API keys from environment
+   */
+  private getGeminiApiKeys(): string[] {
+    const keys = [];
+    for (let i = 1; i <= 50; i++) {
+      const key = process.env[`GEMINI_API_KEY_${i}`];
+      if (key && key !== `API_KEY_${i}` && key !== `your-gemini-key-${i}`) {
+        keys.push(key);
+      }
+    }
+    return keys;
+  }
+
+  /**
+   * Get Instagram automation credentials
+   */
+  private getInstagramAutomationCredentials(): { username: string; password: string } | null {
+    const username = process.env.IGusername;
+    const password = process.env.IGpassword;
+    
+    if (username && password && username !== 'your-instagram-username' && password !== 'your-instagram-password') {
+      return { username, password };
+    }
+    return null;
+  }
+
+  /**
+   * Get Instagram Graph API credentials
+   */
+  private getInstagramCredentials(): any {
+    return {
+      clientId: process.env.INSTAGRAM_CLIENT_ID,
+      clientSecret: process.env.INSTAGRAM_CLIENT_SECRET,
+      redirectUri: process.env.INSTAGRAM_REDIRECT_URI,
+      accessToken: process.env.INSTAGRAM_ACCESS_TOKEN
+    };
   }
 
   /**
@@ -496,4 +604,4 @@ if (require.main === module) {
   });
 }
 
-export default StudiFlowAIEnterpriseApp; 
+export default StudiFlowAIEnterpriseApp;                                      

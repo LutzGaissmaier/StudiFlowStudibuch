@@ -1,0 +1,26 @@
+<!-- Dashboard Selector Component -->
+<div class="dashboard-selector">
+    <a href="/" class="dashboard-option" id="enterprise-option">
+        <span class="dashboard-icon">🏢</span>
+        Enterprise Dashboard
+    </a>
+    <a href="/marketing-dashboard.html" class="dashboard-option" id="marketing-option">
+        <span class="dashboard-icon">📊</span>
+        Marketing Dashboard
+    </a>
+</div>
+
+<script>
+// Auto-activate current dashboard option
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+    const enterpriseOption = document.getElementById('enterprise-option');
+    const marketingOption = document.getElementById('marketing-option');
+    
+    if (currentPath === '/' || currentPath === '/index.html') {
+        enterpriseOption.classList.add('active');
+    } else if (currentPath === '/marketing-dashboard.html') {
+        marketingOption.classList.add('active');
+    }
+});
+</script>

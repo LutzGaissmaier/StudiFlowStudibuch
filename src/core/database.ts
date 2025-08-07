@@ -9,7 +9,7 @@
  */
 
 import mongoose from 'mongoose';
-import { getConfig } from '../config';
+import { getConfig } from '../config/index';
 import { mainLogger } from './logger';
 
 /**
@@ -235,4 +235,4 @@ export class DatabaseManager {
       throw error;
     }
   }
-} 
+}  

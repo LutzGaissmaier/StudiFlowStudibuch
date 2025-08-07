@@ -138,7 +138,7 @@ export class StudiBuchMagazineService {
         timeout: 10000
       });
 
-      const $ = cheerio.load(response.data);
+      const $ = cheerio.load(response.data) as cheerio.CheerioAPI;
       const articles: MagazineArticle[] = [];
 
       // Extract article links from main page
@@ -209,7 +209,7 @@ export class StudiBuchMagazineService {
         timeout: 15000
       });
 
-      const $ = cheerio.load(response.data);
+      const $ = cheerio.load(response.data) as cheerio.CheerioAPI;
 
       // Extract article data
       const title = this.extractTitle($);
@@ -293,7 +293,7 @@ export class StudiBuchMagazineService {
   /**
    * Extract content from article page
    */
-  private extractContent($: cheerio.CheerioAPI): { html: string; text: string } {
+  private extractContent($: cheerio.CheerioAPI): { html: string; text: string; summary: string; wordCount: number } {
     const selectors = [
       '.entry-content',
       '.post-content',
@@ -308,11 +308,15 @@ export class StudiBuchMagazineService {
       if (element.length) {
         const html = element.html() || '';
         const text = element.text().trim();
-        return { html, text };
+        const summary = this.generateSummary(text);
+        const wordCount = text.split(/\s+/).length;
+        return { html, text, summary, wordCount };
       }
     }
 
-    return { html: '', text: '' };
+    const summary = '';
+    const wordCount = 0;
+    return { html: '', text: '', summary, wordCount };
   }
 
   /**
@@ -869,4 +873,4 @@ export class StudiBuchMagazineService {
 
     mainLogger.info(`📝 Created ${mockArticles.length} mock articles and ${mockModifiedContent.length} mock modified content items`);
   }
-} 
+}      

@@ -32,7 +32,6 @@ window.forceCloseModal = function(modalId) {
 window.updateInstagramPreview = function() {
   console.log('👁️ Updating Instagram preview...');
   
-  const format = document.getElementById('target-format')?.value || 'post';
   const tone = document.getElementById('content-tone')?.value || 'educational';
   const audience = document.getElementById('target-audience')?.value || 'students';
   const maxLength = parseInt(document.getElementById('max-length')?.value) || 2000;
@@ -137,7 +136,6 @@ window.updateLengthDisplay = function(value) {
 window.toggleImageGeneration = function() {
   const checkbox = document.getElementById('auto-generate-image');
   const imagePreview = document.getElementById('generated-image-preview');
-  const previewImage = document.getElementById('preview-image');
   const imageStatus = document.getElementById('image-status');
   
   console.log(`🤖 Toggle Image Generation: ${checkbox ? checkbox.checked : 'unknown'}`);
@@ -541,4 +539,4 @@ if (document.readyState === 'loading') {
   initializeModalFixes();
 }
 
-console.log('✅ Modal Fixes loaded successfully'); 
+console.log('✅ Modal Fixes loaded successfully');        

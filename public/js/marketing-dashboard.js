@@ -638,7 +638,6 @@ function attachEngagementButtons() {
   // Find and attach engagement buttons by onclick attribute
   const engagementButtons = document.querySelectorAll('button[onclick*="pauseEngagement"], button[onclick*="stopEngagement"]');
   engagementButtons.forEach(button => {
-    const onclick = button.getAttribute('onclick');
     button.replaceWith(button.cloneNode(true));
     
     // Get the new button and add proper event listener
@@ -682,26 +681,26 @@ function attachFABMenu() {
   
   const fabOptions = document.querySelectorAll('.fab-option');
   fabOptions.forEach((option, index) => {
-    const onclick = option.getAttribute('onclick');
+    const onclickAttr = option.getAttribute('onclick');
     option.replaceWith(option.cloneNode(true));
     
     const newOption = document.querySelectorAll('.fab-option')[index];
-    if (onclick) {
-      if (onclick.includes('pauseAllAutomation')) {
+    if (onclickAttr) {
+      if (onclickAttr.includes('pauseAllAutomation')) {
         newOption.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
           console.log('⏸️ CLICK: Pause All Automation');
           pauseAllAutomation();
         });
-      } else if (onclick.includes('stopAllEngagement')) {
+      } else if (onclickAttr.includes('stopAllEngagement')) {
         newOption.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
           console.log('🛑 CLICK: Stop All Engagement');
           stopAllEngagement();
         });
-      } else if (onclick.includes('contactSupport')) {
+      } else if (onclickAttr.includes('contactSupport')) {
         newOption.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -784,4 +783,4 @@ setInterval(() => {
       listeners: firstButton.onclick !== null
     });
   }
-}, 3000); 
+}, 3000);      

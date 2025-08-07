@@ -265,22 +265,20 @@ class UIManager {
       headerStatus: document.getElementById('header-status'),
       refreshButton: document.getElementById('refresh-all'),
       
-      // Cards
       systemInfoCard: document.getElementById('system-info-card'),
-      systemInfoContent: document.getElementById('system-info-content'),
+      systemInfoContent: document.getElementById('system-health'), // Actual ID in HTML
       servicesCard: document.getElementById('services-card'),
       servicesContent: document.getElementById('services-content'),
       metricsCard: document.getElementById('metrics-card'),
       metricsContent: document.getElementById('metrics-content'),
       
-      // Instagram
+      // Instagram - using actual IDs from HTML
       instagramCard: document.getElementById('instagram-overview-card'),
-      instagramContent: document.getElementById('instagram-overview-content'),
+      instagramContent: document.getElementById('instagram-status'), // Actual ID in HTML
       instagramBadge: document.getElementById('instagram-status-badge'),
       
-      // AI
       aiCard: document.getElementById('ai-overview-card'),
-      aiContent: document.getElementById('ai-overview-content'),
+      aiContent: document.getElementById('ai-services'), // Actual ID in HTML
       aiBadge: document.getElementById('ai-status-badge'),
       
       // Metrics
@@ -561,27 +559,34 @@ class UIManager {
 
     const ai = data.data;
     
-    // Update badge
+    // Update badge based on actual API response
     if (this.elements.aiBadge) {
-      const allOnline = ai.openai.status === 'connected' && ai.gemini.status === 'connected';
-      this.elements.aiBadge.textContent = allOnline ? 'Online' : 'Teilweise';
-      this.elements.aiBadge.className = `card-badge ${allOnline ? 'online' : 'offline'}`;
+      const geminiOnline = ai.gemini && ai.gemini.status === 'connected';
+      const hasKeys = ai.gemini && ai.gemini.keysAvailable > 0;
+      const isOnline = geminiOnline || hasKeys;
+      this.elements.aiBadge.textContent = isOnline ? 'Online' : 'Konfiguration erforderlich';
+      this.elements.aiBadge.className = `card-badge ${isOnline ? 'online' : 'offline'}`;
     }
 
-    // Update content
+    // Update content based on actual API structure
+    const geminiStatus = ai.gemini ? ai.gemini.status : 'unknown';
+    const geminiModel = ai.gemini ? ai.gemini.model : 'N/A';
+    const keysAvailable = ai.gemini ? ai.gemini.keysAvailable : 0;
+    const lastActivity = ai.lastActivity ? new Date(ai.lastActivity).toLocaleString('de-DE') : 'Nie';
+    
     const content = `
       <div class="ai-services">
         <div class="ai-service">
           <div class="service-header">
-            <h4>OpenAI</h4>
-            <span class="status-indicator ${ai.openai.status === 'connected' ? 'online' : 'offline'}"></span>
+            <h4>AI Agent Service</h4>
+            <span class="status-indicator ${ai.initialized ? 'online' : 'offline'}"></span>
           </div>
           <div class="service-details">
             <div class="detail-item">
-              <strong>Status:</strong> ${Utils.sanitizeHTML(ai.openai.status)}
+              <strong>Status:</strong> ${ai.initialized ? 'Initialisiert' : 'Nicht initialisiert'}
             </div>
             <div class="detail-item">
-              <strong>Model:</strong> ${Utils.sanitizeHTML(ai.openai.model)}
+              <strong>Service:</strong> ${Utils.sanitizeHTML(ai.service || 'AI Agent Service')}
             </div>
           </div>
         </div>
@@ -589,20 +594,30 @@ class UIManager {
         <div class="ai-service">
           <div class="service-header">
             <h4>Google Gemini</h4>
-            <span class="status-indicator ${ai.gemini.status === 'connected' ? 'online' : 'offline'}"></span>
+            <span class="status-indicator ${geminiStatus === 'connected' ? 'online' : 'offline'}"></span>
           </div>
           <div class="service-details">
             <div class="detail-item">
-              <strong>Status:</strong> ${Utils.sanitizeHTML(ai.gemini.status)}
+              <strong>Status:</strong> ${Utils.sanitizeHTML(geminiStatus)}
             </div>
             <div class="detail-item">
-              <strong>Model:</strong> ${Utils.sanitizeHTML(ai.gemini.model)}
+              <strong>Model:</strong> ${Utils.sanitizeHTML(geminiModel)}
+            </div>
+            <div class="detail-item">
+              <strong>API Keys:</strong> ${keysAvailable} verfügbar
             </div>
           </div>
         </div>
         
-        <div class="last-generation">
-          <strong>Letzte Generierung:</strong> ${new Date(ai.lastGeneration).toLocaleString('de-DE')}
+        <div class="ai-features">
+          <strong>Features:</strong>
+          <ul>
+            ${ai.features ? ai.features.map(feature => `<li>${Utils.sanitizeHTML(feature)}</li>`).join('') : '<li>Keine Features verfügbar</li>'}
+          </ul>
+        </div>
+        
+        <div class="last-activity">
+          <strong>Letzte Aktivität:</strong> ${lastActivity}
         </div>
       </div>
     `;
@@ -880,7 +895,7 @@ class ExtendedUIManager extends UIManager {
     // Get ALL buttons on the page
     const allButtons = document.querySelectorAll('button, .btn, input[type="button"], input[type="submit"]');
     
-    allButtons.forEach((button, index) => {
+    allButtons.forEach((button) => {
       // Skip if already has universal handler
       if (button.hasAttribute('data-universal-attached')) {
         return;
@@ -1108,7 +1123,7 @@ class ExtendedUIManager extends UIManager {
       case 'cancel':
         this.closeAllModals();
         break;
-      case 'schedule':
+      case 'schedule-post':
         this.schedulePost();
         break;
       case 'save-draft':
@@ -1452,6 +1467,113 @@ class ExtendedUIManager extends UIManager {
     
     // Load magazine data
     this.loadMagazineData();
+  }
+
+  /**
+   * Load magazine data from API
+   */
+  async loadMagazineData() {
+    try {
+      const api = new ApiClient();
+      const response = await api.getMagazineArticles();
+      
+      if (response.success && response.data) {
+        const articles = response.data.map(article => ({
+          id: article.id,
+          title: article.title || 'Unbenannter Artikel',
+          author: article.author || 'StudiBuch Team',
+          publishedAt: new Date(article.publishedAt || Date.now()),
+          summary: article.summary || article.content?.summary || (article.content?.text ? article.content.text.substring(0, 150) + '...' : 'Artikel-Zusammenfassung...'),
+          url: article.url,
+          status: article.status || 'published',
+          category: article.category || 'Allgemein'
+        }));
+        
+        this.renderMagazineArticles(articles);
+        console.log(`✅ ${articles.length} Magazine-Artikel geladen`);
+      } else {
+        throw new Error('Failed to load magazine articles');
+      }
+    } catch (error) {
+      console.error('Error loading magazine data:', error);
+      // Fallback to mock magazine data
+      this.loadMockMagazineData();
+    }
+  }
+
+  /**
+   * Load mock magazine data as fallback
+   */
+  loadMockMagazineData() {
+    const mockArticles = [
+      {
+        id: 1,
+        title: 'Effektive Lernstrategien für das Studium',
+        author: 'Dr. Sarah Weber',
+        publishedAt: new Date('2024-01-15'),
+        summary: 'Entdecke bewährte Methoden und Techniken, die dir helfen, effizienter zu lernen und bessere Ergebnisse zu erzielen...',
+        url: 'https://studibuch.de/artikel/lernstrategien',
+        status: 'published',
+        category: 'Lerntipps'
+      },
+      {
+        id: 2,
+        title: 'Zeitmanagement im Studium meistern',
+        author: 'Prof. Michael Schmidt',
+        publishedAt: new Date('2024-01-10'),
+        summary: 'Lerne, wie du deine Zeit optimal einteilst und Prokrastination überwindest. Praktische Tipps für den Studienalltag...',
+        url: 'https://studibuch.de/artikel/zeitmanagement',
+        status: 'published',
+        category: 'Produktivität'
+      },
+      {
+        id: 3,
+        title: 'Die besten Apps für Studenten 2024',
+        author: 'Lisa Müller',
+        publishedAt: new Date('2024-01-05'),
+        summary: 'Eine Übersicht über die nützlichsten Apps, die dir im Studium helfen können - von Notizen bis zur Zeitplanung...',
+        url: 'https://studibuch.de/artikel/studenten-apps',
+        status: 'published',
+        category: 'Technologie'
+      }
+    ];
+    
+    this.renderMagazineArticles(mockArticles);
+    console.log('📰 Mock Magazine-Artikel geladen');
+  }
+
+  /**
+   * Render magazine articles in the UI
+   */
+  renderMagazineArticles(articles) {
+    const container = document.getElementById('magazine-articles-container');
+    if (!container) return;
+    
+    const html = articles.map(article => `
+      <div class="magazine-article-card" data-article-id="${article.id}">
+        <div class="article-header">
+          <h3 class="article-title">${article.title}</h3>
+          <span class="article-category">${article.category}</span>
+        </div>
+        <div class="article-meta">
+          <span class="article-author">👤 ${article.author}</span>
+          <span class="article-date">📅 ${this.formatTimeAgo(article.publishedAt)}</span>
+        </div>
+        <div class="article-summary">
+          ${article.summary}
+        </div>
+        <div class="article-actions">
+          <button class="btn btn-primary btn-sm" onclick="window.ui.modifyArticle(${article.id})">
+            ✏️ Bearbeiten
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="window.open('${article.url}', '_blank')">
+            🔗 Original ansehen
+          </button>
+        </div>
+      </div>
+    `).join('');
+    
+    container.innerHTML = html;
   }
 
   /**
@@ -1828,7 +1950,7 @@ class ExtendedUIManager extends UIManager {
     if (!bestTimes) return;
 
     const days = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
-    const html = days.map((day, index) => {
+    const html = days.map((day) => {
       const performance = Math.random();
       const className = performance > 0.7 ? 'best' : performance > 0.4 ? 'good' : '';
       return `<div class="time-cell ${className}">${day}<br>18:00</div>`;
@@ -1905,16 +2027,6 @@ class ExtendedUIManager extends UIManager {
     });
   }
 
-  /**
-   * Show modal
-   */
-  showModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-      modal.classList.add('show');
-      document.body.style.overflow = 'hidden';
-    }
-  }
 
   /**
    * Hide modal
@@ -3660,7 +3772,6 @@ class ExtendedUIManager extends UIManager {
   updateInstagramPreview() {
     console.log('👁️ Updating Instagram preview...');
     
-    const format = document.getElementById('target-format')?.value || 'post';
     const tone = document.getElementById('content-tone')?.value || 'educational';
     const audience = document.getElementById('target-audience')?.value || 'students';
     const maxLength = parseInt(document.getElementById('max-length')?.value) || 2000;
@@ -3840,7 +3951,6 @@ class ExtendedUIManager extends UIManager {
 }
 
 // Replace the original UIManager with extended version
-const originalUIManager = UIManager;
 window.UIManager = ExtendedUIManager;
 
 // Update the main app initialization
@@ -3862,5 +3972,4 @@ if (typeof app !== 'undefined') {
 }
 
 // Make UI manager globally available for button clicks
-window.ui = app?.ui || new ExtendedUIManager(); 
-window.ui = app?.ui || new ExtendedUIManager(); 
+window.ui = app?.ui || new ExtendedUIManager();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                

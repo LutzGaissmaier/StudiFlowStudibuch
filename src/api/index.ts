@@ -107,66 +107,110 @@ export function createAPIRoutes(
   });
 
   // AI Status endpoint
-  router.get('/ai/status', (req: Request, res: Response) => {
-    res.json({
-      success: true,
-      data: {
-        openai: { 
-          status: 'connected', 
-          model: 'gpt-4-turbo',
-          lastRequest: new Date(Date.now() - 1200000).toISOString(),
-          tokensUsed: 2847,
-          tokensLimit: 50000,
-          requestsToday: 23
-        },
-        gemini: { 
-          status: 'connected', 
-          model: 'gemini-pro',
-          lastRequest: new Date(Date.now() - 900000).toISOString(),
-          requestsToday: 127,
-          requestsLimit: 1000
-        },
-        contentGeneration: {
-          active: true,
-          successRate: 0.94,
-          averageResponseTime: 2.3,
-          generationsToday: 23,
-          queueLength: 2
-        },
-        lastGeneration: new Date(Date.now() - 600000).toISOString()
+  router.get('/ai/status', async (req: Request, res: Response) => {
+    try {
+      console.log('🔍 AI Status endpoint called');
+      const aiService = (global as any).aiService;
+      console.log('🔍 aiService from global:', !!aiService, typeof aiService);
+      
+      if (!aiService) {
+        console.log('🔍 AI service not found in global scope');
+        return res.json({
+          success: false,
+          error: { code: 'AI_SERVICE_UNAVAILABLE', message: 'AI service not initialized' }
+        });
       }
-    });
+
+      console.log('🔍 Calling aiService.getStatus()');
+      const status = aiService.getStatus();
+      console.log('🔍 Got status:', status);
+      
+      return res.json({
+        success: true,
+        data: status
+      });
+    } catch (error) {
+      console.error('🔍 AI Status endpoint error:', error);
+      return res.status(500).json({
+        success: false,
+        error: { code: 'AI_STATUS_FAILED', message: 'Failed to get AI status' }
+      });
+    }
+  });
+
+  // AI Content Generation endpoint
+  router.post('/ai/generate', async (req: Request, res: Response) => {
+    try {
+      const aiService = (global as any).aiService;
+      if (!aiService) {
+        return res.status(503).json({
+          success: false,
+          error: { code: 'AI_SERVICE_UNAVAILABLE', message: 'AI service not initialized' }
+        });
+      }
+
+      const { prompt, type = 'instagram', style = 'casual' } = req.body;
+      if (!prompt) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'MISSING_PROMPT', message: 'Prompt is required' }
+        });
+      }
+
+      const result = await aiService.generateContent(prompt, type, style);
+      return res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        error: { code: 'CONTENT_GENERATION_FAILED', message: 'Failed to generate content' }
+      });
+    }
+  });
+
+  // AI Characters endpoint
+  router.get('/ai/characters', async (req: Request, res: Response) => {
+    try {
+      const aiService = (global as any).aiService;
+      if (!aiService) {
+        return res.status(503).json({
+          success: false,
+          error: { code: 'AI_SERVICE_UNAVAILABLE', message: 'AI service not initialized' }
+        });
+      }
+
+      const characters = await aiService.getAvailableCharacters();
+      res.json({
+        success: true,
+        data: characters
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: { code: 'CHARACTERS_FETCH_FAILED', message: 'Failed to fetch characters' }
+      });
+    }
   });
 
   // Health check endpoint
   router.get('/health', async (req: Request, res: Response) => {
     try {
-      const services = {
-        database: { status: 'up', latency: Math.floor(Math.random() * 20) + 5 },
-        redis: { status: 'up', latency: Math.floor(Math.random() * 10) + 2 },
-        instagram: { status: 'up', latency: Math.floor(Math.random() * 200) + 100 },
-        ai: { status: 'up', latency: Math.floor(Math.random() * 400) + 200 },
-        scheduler: { status: 'up', latency: Math.floor(Math.random() * 15) + 5 },
-        magazine: { status: 'up', latency: Math.floor(Math.random() * 30) + 10 }
-      };
+      const healthMonitor = (global as any).healthMonitor;
+      if (!healthMonitor) {
+        return res.status(503).json({
+          success: false,
+          error: { code: 'HEALTH_MONITOR_UNAVAILABLE', message: 'Health monitor not initialized' }
+        });
+      }
 
-      const metrics = {
-        uptime: process.uptime(),
-        memory: process.memoryUsage(),
-        cpu: {
-          percentage: Math.random() * 50 + 10,
-          loadAverage: require('os').loadavg()
-        }
-      };
-
-      res.json({
-        success: true,
-        data: {
-          status: 'healthy',
-          services,
-          metrics,
-          lastCheck: new Date().toISOString()
-        }
+      const health = await healthMonitor.getSystemHealth();
+      const statusCode = health.status === 'healthy' ? 200 : health.status === 'degraded' ? 206 : 503;
+      
+      res.status(statusCode).json({
+        success: health.status !== 'unhealthy',
+        data: health
       });
     } catch (error) {
       res.status(500).json({
@@ -1369,6 +1413,210 @@ export function createAPIRoutes(
 
   mainLogger.info('✅ API routes configured successfully');
   
+  // Automation control endpoints
+  router.post('/automation/start', async (req: Request, res: Response) => {
+    try {
+      const realAutomationService = (global as any).realAutomationService;
+      if (!realAutomationService) {
+        return res.status(503).json({
+          success: false,
+          error: { code: 'AUTOMATION_SERVICE_UNAVAILABLE', message: 'Automation service not initialized' }
+        });
+      }
+
+      const { strategy, hashtags } = req.body;
+      if (!strategy || !hashtags) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'MISSING_PARAMETERS', message: 'Strategy and hashtags are required' }
+        });
+      }
+
+      const result = await realAutomationService.startAutomation(strategy, hashtags);
+      
+      const io = (global as any).io;
+      if (io) {
+        io.to('automation_updates').emit('automation_started', result);
+      }
+      
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: { code: 'AUTOMATION_START_FAILED', message: 'Failed to start automation' }
+      });
+    }
+  });
+
+  router.post('/automation/pause', async (req: Request, res: Response) => {
+    try {
+      const realAutomationService = (global as any).realAutomationService;
+      if (!realAutomationService) {
+        return res.status(503).json({
+          success: false,
+          error: { code: 'AUTOMATION_SERVICE_UNAVAILABLE', message: 'Automation service not initialized' }
+        });
+      }
+
+      const result = await realAutomationService.pauseAutomation();
+      
+      const io = (global as any).io;
+      if (io) {
+        io.to('automation_updates').emit('automation_paused', result);
+      }
+      
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: { code: 'AUTOMATION_PAUSE_FAILED', message: 'Failed to pause automation' }
+      });
+    }
+  });
+
+  router.post('/automation/stop', async (req: Request, res: Response) => {
+    try {
+      const realAutomationService = (global as any).realAutomationService;
+      if (!realAutomationService) {
+        return res.status(503).json({
+          success: false,
+          error: { code: 'AUTOMATION_SERVICE_UNAVAILABLE', message: 'Automation service not initialized' }
+        });
+      }
+
+      const result = await realAutomationService.stopAutomation();
+      
+      const io = (global as any).io;
+      if (io) {
+        io.to('automation_updates').emit('automation_stopped', result);
+      }
+      
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: { code: 'AUTOMATION_STOP_FAILED', message: 'Failed to stop automation' }
+      });
+    }
+  });
+
+  router.post('/automation/emergency-stop', async (req: Request, res: Response) => {
+    try {
+      const realAutomationService = (global as any).realAutomationService;
+      if (!realAutomationService) {
+        return res.status(503).json({
+          success: false,
+          error: { code: 'AUTOMATION_SERVICE_UNAVAILABLE', message: 'Automation service not initialized' }
+        });
+      }
+
+      const { reason = 'Manual emergency stop' } = req.body;
+      const result = await realAutomationService.emergencyStop(reason);
+      
+      const io = (global as any).io;
+      if (io) {
+        io.to('automation_updates').emit('automation_emergency_stopped', result);
+      }
+      
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: { code: 'EMERGENCY_STOP_FAILED', message: 'Failed to execute emergency stop' }
+      });
+    }
+  });
+
+  router.get('/automation/status', async (req: Request, res: Response) => {
+    try {
+      const realAutomationService = (global as any).realAutomationService;
+      if (!realAutomationService) {
+        return res.status(503).json({
+          success: false,
+          error: { code: 'AUTOMATION_SERVICE_UNAVAILABLE', message: 'Automation service not initialized' }
+        });
+      }
+
+      const status = realAutomationService.getAutomationStatus();
+      res.json(status);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: { code: 'STATUS_FETCH_FAILED', message: 'Failed to fetch automation status' }
+      });
+    }
+  });
+
+  router.get('/automation/compliance', async (req: Request, res: Response) => {
+    try {
+      const realAutomationService = (global as any).realAutomationService;
+      if (!realAutomationService) {
+        return res.status(503).json({
+          success: false,
+          error: { code: 'AUTOMATION_SERVICE_UNAVAILABLE', message: 'Automation service not initialized' }
+        });
+      }
+
+      const report = await realAutomationService.exportReport('json');
+      res.json({
+        success: true,
+        data: {
+          compliance: report.data.complianceReport,
+          generatedAt: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: { code: 'COMPLIANCE_REPORT_FAILED', message: 'Failed to generate compliance report' }
+      });
+    }
+  });
+
+  router.post('/automation/pause-all', async (req: Request, res: Response) => {
+    try {
+      const realAutomationService = (global as any).realAutomationService;
+      const instagramService = (global as any).instagramService;
+      
+      if (!realAutomationService) {
+        return res.status(503).json({
+          success: false,
+          error: { code: 'AUTOMATION_SERVICE_UNAVAILABLE', message: 'Automation service not initialized' }
+        });
+      }
+
+      const results = [];
+      
+      const mainResult = await realAutomationService.pauseAutomation();
+      results.push({ service: 'main_automation', result: mainResult });
+      
+      if (instagramService) {
+        try {
+          const igResult = await instagramService.pauseAutomation();
+          results.push({ service: 'instagram_automation', result: igResult });
+        } catch (error) {
+          results.push({ service: 'instagram_automation', result: { success: false, message: 'Not available' } });
+        }
+      }
+      
+      const io = (global as any).io;
+      if (io) {
+        io.to('automation_updates').emit('all_automation_paused', results);
+      }
+      
+      res.json({
+        success: true,
+        data: results,
+        message: 'All automation services paused'
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: { code: 'PAUSE_ALL_FAILED', message: 'Failed to pause all automation' }
+      });
+    }
+  });
+
   return router;
 }
 
@@ -1391,4 +1639,4 @@ function generateMockChartData(period: string) {
   }
   
   return data;
-} 
+}          

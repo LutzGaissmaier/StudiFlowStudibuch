@@ -11,17 +11,29 @@ import { mainLogger } from '../../core/logger';
 import { InstagramAuthService, InstagramCredentials } from './auth';
 import { InstagramContentService } from './content';
 import { InstagramInteractionService } from './interaction';
+import { InstagramAutomationService, InstagramAutomationCredentials } from './automation';
+import { AIAgentService } from '../ai/agent';
 
 export class InstagramService {
   private authService: InstagramAuthService;
   private contentService: InstagramContentService;
   private interactionService: InstagramInteractionService;
+  private automationService: InstagramAutomationService | null = null;
+  private aiAgent: AIAgentService | null = null;
   private isInitialized = false;
 
-  constructor(credentials: InstagramCredentials) {
+  constructor(credentials: InstagramCredentials, automationCredentials?: InstagramAutomationCredentials, geminiApiKeys?: string[]) {
     this.authService = new InstagramAuthService(credentials);
     this.contentService = new InstagramContentService(credentials);
     this.interactionService = new InstagramInteractionService(credentials);
+    
+    if (geminiApiKeys && geminiApiKeys.length > 0) {
+      this.aiAgent = new AIAgentService(geminiApiKeys);
+      
+      if (automationCredentials) {
+        this.automationService = new InstagramAutomationService(credentials, automationCredentials, this.aiAgent);
+      }
+    }
   }
 
   /**
@@ -47,6 +59,10 @@ export class InstagramService {
         const updatedCredentials = this.authService.getCredentials();
         this.contentService.setCredentials(updatedCredentials);
         this.interactionService.setCredentials(updatedCredentials);
+      }
+      
+      if (this.automationService) {
+        await this.automationService.initialize();
       }
       
       this.isInitialized = true;
@@ -79,10 +95,26 @@ export class InstagramService {
   }
 
   /**
+   * Gibt den Automation-Service zurück
+   */
+  getAutomationService(): InstagramAutomationService | null {
+    return this.automationService;
+  }
+
+  /**
+   * Gibt den AI-Agent-Service zurück
+   */
+  getAIAgentService(): AIAgentService | null {
+    return this.aiAgent;
+  }
+
+  /**
    * Prüft, ob der Service gesund ist
    */
   async isHealthy(): Promise<boolean> {
-    return this.isInitialized && this.authService.hasValidCredentials();
+    const baseHealthy = this.isInitialized && this.authService.hasValidCredentials();
+    const automationHealthy = this.automationService ? this.automationService.isHealthy() : true;
+    return baseHealthy && automationHealthy;
   }
 
   /**
@@ -90,6 +122,11 @@ export class InstagramService {
    */
   async shutdown(): Promise<void> {
     mainLogger.info('📱 Instagram service shutting down...');
+    
+    if (this.automationService) {
+      await this.automationService.shutdown();
+    }
+    
     this.isInitialized = false;
     mainLogger.info('✅ Instagram service shutdown');
   }
@@ -99,3 +136,4 @@ export class InstagramService {
 export * from './auth';
 export * from './content';
 export * from './interaction';
+export * from './automation';
