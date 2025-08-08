@@ -11,6 +11,7 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { promises as fs } from 'fs';
 import path from 'path';
+import sharp from 'sharp';
 import { mainLogger } from '../core/logger';
 
 export interface MagazineArticle {
@@ -95,11 +96,13 @@ export interface ModifiedContent {
 export class StudiBuchMagazineService {
   private baseUrl = 'https://studibuch.de/magazin';
   private cacheDir = path.join(process.cwd(), 'cache', 'magazine');
+  private imageDir = path.join(process.cwd(), 'public', 'assets', 'images', 'magazine');
   private articles: Map<string, MagazineArticle> = new Map();
   private modifiedContent: Map<string, ModifiedContent> = new Map();
 
   constructor() {
     this.ensureCacheDirectory();
+    this.ensureImageDirectory();
   }
 
   /**
@@ -113,6 +116,7 @@ export class StudiBuchMagazineService {
       await this.loadCachedArticles();
       
       // Add mock data for immediate functionality
+      await this.createSampleImages();
       await this.createMockData();
       
       mainLogger.info(`📦 Loaded ${this.articles.size} cached articles and ${this.modifiedContent.size} modified content items`);
@@ -218,7 +222,8 @@ export class StudiBuchMagazineService {
       const publishedAt = this.extractPublishedDate($);
       const category = this.extractCategory($);
       const content = this.extractContent($);
-      const images = this.extractImages($, url);
+      const articleId = this.generateArticleId(url);
+      const images = await this.extractImages($, url, articleId);
       const tags = this.extractTags($);
 
       if (!title || !content.text) {
@@ -465,20 +470,26 @@ export class StudiBuchMagazineService {
     return $('.subtitle, .excerpt').first().text().trim() || undefined;
   }
 
-  private extractImages($: cheerio.CheerioAPI, baseUrl: string): MagazineArticle['images'] {
-    const images: string[] = [];
+  private async extractImages($: cheerio.CheerioAPI, baseUrl: string, articleId: string): Promise<MagazineArticle['images']> {
+    const imageUrls: string[] = [];
+    
+    // Extract image URLs with better selectors
     $('img').each((_, img) => {
-      const src = $(img).attr('src');
+      const src = $(img).attr('src') || $(img).attr('data-src') || $(img).attr('data-lazy-src');
       if (src) {
-        images.push(src.startsWith('http') ? src : new URL(src, baseUrl).href);
+        const fullUrl = src.startsWith('http') ? src : new URL(src, baseUrl).href;
+        if (!src.includes('icon') && !src.includes('logo') && !src.includes('avatar')) {
+          imageUrls.push(fullUrl);
+        }
       }
     });
 
-    return {
-      featured: images[0],
-      gallery: images.slice(1, 11), // Max 10 additional images
-      alt: []
-    };
+    const ogImage = $('meta[property="og:image"]').attr('content');
+    if (ogImage && !imageUrls.includes(ogImage)) {
+      imageUrls.unshift(ogImage); // Add as first image
+    }
+
+    return await this.downloadAndProcessImages(imageUrls, articleId);
   }
 
   private extractTags($: cheerio.CheerioAPI): string[] {
@@ -639,6 +650,112 @@ export class StudiBuchMagazineService {
     }
   }
 
+  /**
+   * Download and process images from URLs
+   */
+  private async downloadAndProcessImages(imageUrls: string[], articleId: string): Promise<{ featured?: string; gallery: string[]; alt: string[] }> {
+    const processedImages: string[] = [];
+    const altTexts: string[] = [];
+    
+    await this.ensureImageDirectory();
+    
+    for (let i = 0; i < imageUrls.length; i++) {
+      const imageUrl = imageUrls[i];
+      try {
+        const processedImagePath = await this.downloadAndProcessImage(imageUrl, articleId, i);
+        if (processedImagePath) {
+          processedImages.push(processedImagePath);
+          altTexts.push(`Bild ${i + 1} aus StudiBuch Artikel`);
+        }
+      } catch (error) {
+        mainLogger.warn(`Failed to download image: ${imageUrl}`, error);
+      }
+    }
+    
+    return {
+      featured: processedImages[0],
+      gallery: processedImages.slice(1),
+      alt: altTexts
+    };
+  }
+
+  /**
+   * Download and process a single image
+   */
+  private async downloadAndProcessImage(imageUrl: string, articleId: string, index: number): Promise<string | null> {
+    try {
+      const urlHash = Buffer.from(imageUrl).toString('base64').slice(0, 8);
+      const filename = `${articleId}_${index}_${urlHash}`;
+      const originalPath = path.join(this.imageDir, `${filename}_original.jpg`);
+      const thumbnailPath = path.join(this.imageDir, `${filename}_thumb.jpg`);
+      const instagramPath = path.join(this.imageDir, `${filename}_instagram.jpg`);
+      
+      if (await this.fileExists(originalPath)) {
+        return `/assets/images/magazine/${filename}_original.jpg`;
+      }
+      
+      const response = await axios.get(imageUrl, {
+        responseType: 'arraybuffer',
+        timeout: 30000,
+        headers: {
+          'User-Agent': 'Riona AI Content Bot 1.0'
+        }
+      });
+      
+      const imageBuffer = Buffer.from(response.data);
+      
+      const image = sharp(imageBuffer);
+      const metadata = await image.metadata();
+      
+      await image
+        .resize(1200, null, { withoutEnlargement: true })
+        .jpeg({ quality: 85 })
+        .toFile(originalPath);
+      
+      // Create thumbnail (300x200)
+      await image
+        .resize(300, 200, { fit: 'cover' })
+        .jpeg({ quality: 80 })
+        .toFile(thumbnailPath);
+      
+      // Create Instagram optimized (1080x1080)
+      await image
+        .resize(1080, 1080, { fit: 'cover' })
+        .jpeg({ quality: 90 })
+        .toFile(instagramPath);
+      
+      mainLogger.info(`✅ Processed image: ${filename} (${metadata.width}x${metadata.height})`);
+      
+      return `/assets/images/magazine/${filename}_original.jpg`;
+    } catch (error) {
+      mainLogger.error(`Failed to process image: ${imageUrl}`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Ensure image directory exists
+   */
+  private async ensureImageDirectory(): Promise<void> {
+    try {
+      await fs.mkdir(this.imageDir, { recursive: true });
+    } catch (error) {
+      mainLogger.warn('Failed to create image directory', error);
+    }
+  }
+
+  /**
+   * Check if file exists
+   */
+  private async fileExists(filePath: string): Promise<boolean> {
+    try {
+      await fs.access(filePath);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   private async cacheArticle(article: MagazineArticle): Promise<void> {
     try {
       const filePath = path.join(this.cacheDir, `article_${article.id}.json`);
@@ -713,7 +830,7 @@ export class StudiBuchMagazineService {
           wordCount: 850
         },
         images: {
-          featured: 'https://via.placeholder.com/800x600?text=Lerntipps',
+          featured: '/assets/images/magazine/mock-article-1_0_sample.jpg',
           gallery: [],
           alt: ['Studierende beim Lernen']
         },
@@ -751,9 +868,9 @@ export class StudiBuchMagazineService {
           wordCount: 720
         },
         images: {
-          featured: 'https://via.placeholder.com/800x600?text=Balance',
+          featured: '/assets/images/magazine/mock-article-2_0_sample.jpg',
           gallery: [],
-          alt: ['Student bei der Zeitplanung']
+          alt: ['Work-Life-Balance Illustration']
         },
         metadata: {
           readTime: 3,
@@ -789,9 +906,9 @@ export class StudiBuchMagazineService {
           wordCount: 650
         },
         images: {
-          featured: 'https://via.placeholder.com/800x600?text=Motivation',
+          featured: '/assets/images/magazine/mock-article-3_0_sample.jpg',
           gallery: [],
-          alt: ['Motivierter Student']
+          alt: ['Motivations-Tipps Grafik']
         },
         metadata: {
           readTime: 3,
@@ -873,4 +990,43 @@ export class StudiBuchMagazineService {
 
     mainLogger.info(`📝 Created ${mockArticles.length} mock articles and ${mockModifiedContent.length} mock modified content items`);
   }
-}      
+
+  /**
+   * Create sample images for testing
+   */
+  private async createSampleImages(): Promise<void> {
+    try {
+      await this.ensureImageDirectory();
+      
+      const sampleImages = [
+        { name: 'mock-article-1_0_sample.jpg', color: '#667eea', text: 'Lerntipps' },
+        { name: 'mock-article-2_0_sample.jpg', color: '#764ba2', text: 'Balance' },
+        { name: 'mock-article-3_0_sample.jpg', color: '#10b981', text: 'Motivation' }
+      ];
+      
+      for (const sample of sampleImages) {
+        const imagePath = path.join(this.imageDir, sample.name);
+        
+        if (!(await this.fileExists(imagePath))) {
+          const svg = `
+            <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+              <rect width="800" height="600" fill="${sample.color}"/>
+              <text x="400" y="300" font-family="Arial, sans-serif" font-size="48" 
+                    fill="white" text-anchor="middle" dominant-baseline="middle">
+                ${sample.text}
+              </text>
+            </svg>
+          `;
+          
+          await sharp(Buffer.from(svg))
+            .jpeg({ quality: 85 })
+            .toFile(imagePath);
+            
+          mainLogger.info(`✅ Created sample image: ${sample.name}`);
+        }
+      }
+    } catch (error) {
+      mainLogger.warn('Failed to create sample images', error);
+    }
+  }
+}                                                                  

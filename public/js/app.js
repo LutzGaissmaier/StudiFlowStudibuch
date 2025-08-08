@@ -1551,6 +1551,12 @@ class ExtendedUIManager extends UIManager {
     
     const html = articles.map(article => `
       <div class="magazine-article-card" data-article-id="${article.id}">
+        ${article.images?.featured ? `
+          <div class="article-image">
+            <img src="${article.images.featured}" alt="${article.images.alt?.[0] || article.title}" 
+                 loading="lazy" onerror="this.style.display='none'">
+          </div>
+        ` : ''}
         <div class="article-header">
           <h3 class="article-title">${article.title}</h3>
           <span class="article-category">${article.category}</span>
@@ -1560,10 +1566,10 @@ class ExtendedUIManager extends UIManager {
           <span class="article-date">📅 ${this.formatTimeAgo(article.publishedAt)}</span>
         </div>
         <div class="article-summary">
-          ${article.summary}
+          ${article.content?.summary || article.summary}
         </div>
         <div class="article-actions">
-          <button class="btn btn-primary btn-sm" onclick="window.ui.modifyArticle(${article.id})">
+          <button class="btn btn-primary btn-sm" onclick="window.ui.modifyArticle('${article.id}')">
             ✏️ Bearbeiten
           </button>
           <button class="btn btn-secondary btn-sm" onclick="window.open('${article.url}', '_blank')">
@@ -3972,4 +3978,4 @@ if (typeof app !== 'undefined') {
 }
 
 // Make UI manager globally available for button clicks
-window.ui = app?.ui || new ExtendedUIManager();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+window.ui = app?.ui || new ExtendedUIManager();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
