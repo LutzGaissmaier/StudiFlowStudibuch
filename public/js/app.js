@@ -1486,7 +1486,8 @@ class ExtendedUIManager extends UIManager {
           summary: article.summary || article.content?.summary || (article.content?.text ? article.content.text.substring(0, 150) + '...' : 'Artikel-Zusammenfassung...'),
           url: article.url,
           status: article.status || 'published',
-          category: article.category || 'Allgemein'
+          category: article.category || 'Allgemein',
+          images: article.images || { featured: null, gallery: [], alt: [] }
         }));
         
         this.renderMagazineArticles(articles);
@@ -1546,11 +1547,17 @@ class ExtendedUIManager extends UIManager {
    * Render magazine articles in the UI
    */
   renderMagazineArticles(articles) {
-    const container = document.getElementById('magazine-articles-container');
+    const container = document.getElementById('magazine-articles-grid');
     if (!container) return;
     
     const html = articles.map(article => `
       <div class="magazine-article-card" data-article-id="${article.id}">
+        ${article.images?.featured ? `
+          <div class="article-image">
+            <img src="${article.images.featured}" alt="${article.images.alt?.[0] || article.title}" 
+                 loading="lazy" onerror="this.style.display='none'">
+          </div>
+        ` : ''}
         <div class="article-header">
           <h3 class="article-title">${article.title}</h3>
           <span class="article-category">${article.category}</span>
@@ -1560,10 +1567,10 @@ class ExtendedUIManager extends UIManager {
           <span class="article-date">📅 ${this.formatTimeAgo(article.publishedAt)}</span>
         </div>
         <div class="article-summary">
-          ${article.summary}
+          ${article.content?.summary || article.summary}
         </div>
         <div class="article-actions">
-          <button class="btn btn-primary btn-sm" onclick="window.ui.modifyArticle(${article.id})">
+          <button class="btn btn-primary btn-sm" onclick="window.ui.modifyArticle('${article.id}')">
             ✏️ Bearbeiten
           </button>
           <button class="btn btn-secondary btn-sm" onclick="window.open('${article.url}', '_blank')">
@@ -3972,4 +3979,4 @@ if (typeof app !== 'undefined') {
 }
 
 // Make UI manager globally available for button clicks
-window.ui = app?.ui || new ExtendedUIManager();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+window.ui = app?.ui || new ExtendedUIManager();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                

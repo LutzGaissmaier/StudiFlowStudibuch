@@ -57,131 +57,12 @@
     </style>
 </head>
 <body>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudiFlow AI - Unified Dashboard</title>
-    <link rel="stylesheet" href="css/marketing-dashboard.css">
-    <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
     <script>
-        window.location.href = '/unified-dashboard.html';
+        // Redirect to unified dashboard
+        window.location.href = '/public/unified-dashboard.html';
     </script>
-</head>
-<body>
-    <div style="display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center;">
-        <div>
-            <h1>🎓 StudiFlow AI</h1>
-            <p>Weiterleitung zum Unified Dashboard...</p>
-            <p><a href="/unified-dashboard.html">Hier klicken falls die Weiterleitung nicht funktioniert</a></p>
-        </div>
-    </div>
 </body>
 </html>
-
-    <!-- Header -->
-    <header class="dashboard-header">
-        <a href="/marketing-dashboard.html" class="header-brand">
-            <div class="header-brand-icon">🎓</div>
-            <div>
-                <div>StudiFlow AI Marketing</div>
-                <small style="font-size: var(--font-size-sm); font-weight: var(--font-weight-normal); opacity: 0.8;">Intelligente Content Management</small>
-            </div>
-        </a>
-        
-        <div class="header-nav">
-            <a href="/" class="btn btn-outline btn-sm">🏢 Enterprise Dashboard</a>
-        </div>
-
-        <div class="header-actions">
-            <div class="badge badge-success" id="system-status">
-                <span>●</span>
-                <span>System Online</span>
-            </div>
-            <button class="btn btn-error btn-sm" id="emergency-stop">🛑 Notfall-Stop</button>
-        </div>
-    </header>
-
-    <!-- Sidebar -->
-    <aside class="dashboard-sidebar">
-        <div class="sidebar-section">
-            <h3 class="sidebar-title">Navigation</h3>
-            <nav class="sidebar-nav">
-                <a href="#overview" class="sidebar-nav-item active" data-section="overview">
-                    <span class="sidebar-nav-icon">📊</span>
-                    Überblick
-                </a>
-                <a href="#content" class="sidebar-nav-item" data-section="content">
-                    <span class="sidebar-nav-icon">📝</span>
-                    Content Pipeline
-                </a>
-                <a href="#engagement" class="sidebar-nav-item" data-section="engagement">
-                    <span class="sidebar-nav-icon">💬</span>
-                    Engagement Live
-                </a>
-                <a href="#performance" class="sidebar-nav-item" data-section="performance">
-                    <span class="sidebar-nav-icon">📈</span>
-                    Performance
-                </a>
-                <a href="#alerts" class="sidebar-nav-item" data-section="alerts">
-                    <span class="sidebar-nav-icon">🚨</span>
-                    Alerts
-                </a>
-            </nav>
-        </div>
-    </aside>
-
-    <!-- Debug Info -->
-    <div style="position: fixed; top: 100px; right: 20px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; font-size: 12px; z-index: 1000;">
-        <div>Aktive Sektion: <span id="debug-section">overview</span></div>
-        <div>Marketing Dashboard v2.0</div>
-    </div>
-
-    <!-- Main Content -->
-    <main class="dashboard-main">
-        
-        <!-- OVERVIEW SECTION -->
-        <section id="overview-section" class="section active" style="display: block !important;">
-            <div class="main-header">
-                <h1 class="main-title">📊 Heute auf einen Blick</h1>
-                <p class="main-subtitle">Marketing Dashboard für StudiBuch Content Management</p>
-            </div>
-            
-            <!-- Marketing Dashboard Info Banner -->
-            <div class="card" style="background: var(--gradient-primary); color: white; margin-bottom: var(--space-8);">
-                <div class="card-body text-center">
-                    <h3 style="color: white; margin-bottom: var(--space-2);">🎯 StudiBuch Marketing Dashboard</h3>
-                    <p style="color: white; opacity: 0.9; margin: 0;">Optimiert für Marketing-Teams • Live-Updates • Intelligente Automatisierung</p>
-                </div>
-            </div>
-            
-            <!-- Quick Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="stat-card">
-                    <div class="stat-value" id="posts-today">3</div>
-                    <div class="stat-label">📱 Posts heute</div>
-                    <div class="stat-change positive">↗ +2 seit gestern</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value" id="engagement-rate">4.2%</div>
-                    <div class="stat-label">❤️ Engagement Rate</div>
-                    <div class="stat-change positive">↗ +0.8% seit gestern</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value" id="new-followers">+47</div>
-                    <div class="stat-label">👥 Neue Follower</div>
-                    <div class="stat-change positive">↗ +12 seit gestern</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value" id="reach-today">2.8K</div>
-                    <div class="stat-label">📊 Reichweite</div>
-                    <div class="stat-change neutral">→ ±0% seit gestern</div>
-                </div>
-            </div>
 
             <!-- Live Activity -->
             <div class="dashboard-grid">
@@ -588,7 +469,7 @@
             
             <!-- Alert Summary -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="stat-card" style="border-left: 4px solid var(--error-500);"
+                <div class="stat-card" style="border-left: 4px solid var(--error-500);">
                     <span class="alert-count">1</span>
                     <span class="alert-label">Kritisch</span>
                 </div>
@@ -660,6 +541,9 @@
         </div>
     </div>
 
-    <script src="/js/marketing-dashboard.js"></script>
+    <script>
+        // Redirect to unified dashboard
+        window.location.href = '/public/unified-dashboard.html';
+    </script>
 </body>
-</html>      
+</html>   
